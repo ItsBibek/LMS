@@ -14,10 +14,9 @@
   <div class="min-h-screen flex">
    <aside class="w-64 bg-white border-r border-slate-200 hidden md:block">
     <div class="p-4 border-b border-slate-200 flex items-center gap-3">
-     <img src="{{ asset('images/academia-logo.png') }}" alt="Academia International College" class="w-10 h-10 rounded-lg object-cover" />
+     <!-- <img src="{{ asset('images/academia-logo.png') }}" alt="Academia International College" class="w-10 h-10 rounded-lg object-cover" /> -->
      <div>
-      <h1 class="text-base font-semibold">Library</h1>
-      <p class="text-xs text-slate-500">Management</p>
+      <h1 class="text-base font-semibold"> Academia Library</h1>
      </div>
     </div>
     <nav class="p-3 space-y-1">

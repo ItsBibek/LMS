@@ -15,7 +15,11 @@
   <div class="lg:col-span-1 space-y-6">
    <div class="bg-white border border-slate-200 rounded-xl p-6">
     <div class="flex items-start gap-4">
-     <div class="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xl">{{ strtoupper(substr($student->student_name, 0, 1)) }}</div>
+     @if ($student->photo_path && Storage::disk('public')->exists($student->photo_path))
+      <img src="{{ Storage::url($student->photo_path) }}" alt="Photo of {{ $student->student_name }}" class="w-16 h-16 rounded-full object-cover" />
+     @else
+      <div class="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xl">{{ strtoupper(substr($student->student_name, 0, 1)) }}</div>
+     @endif
      <div>
       <div class="text-base font-semibold">{{ $student->student_name }}</div>
       <div class="text-sm text-slate-500">Batch: {{ $student->batch_no }}</div>
