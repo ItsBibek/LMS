@@ -26,6 +26,7 @@ class User extends Authenticatable
         'batch_no',
         'faculty',
         'email',
+        'photo_path',
     ];
 
     /**

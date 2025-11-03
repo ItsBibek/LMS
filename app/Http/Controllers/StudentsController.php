@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class StudentsController extends Controller
 {
@@ -144,7 +145,12 @@ class StudentsController extends Controller
             'batch_no' => ['required','string','max:255','unique:users,batch_no'],
             'email' => ['nullable','email','max:255'],
             'faculty' => ['nullable','string','max:255'],
+            'photo' => ['nullable','image','max:2048'],
         ]);
+
+        if ($request->hasFile('photo')) {
+            $data['photo_path'] = $request->file('photo')->store('students', 'public');
+        }
 
         $student = User::create($data);
 
@@ -163,7 +169,15 @@ class StudentsController extends Controller
             'batch_no' => ['required','string','max:255', Rule::unique('users','batch_no')->ignore($student->batch_no, 'batch_no')],
             'email' => ['nullable','email','max:255'],
             'faculty' => ['nullable','string','max:255'],
+            'photo' => ['nullable','image','max:2048'],
         ]);
+
+        if ($request->hasFile('photo')) {
+            if (!empty($student->photo_path)) {
+                Storage::disk('public')->delete($student->photo_path);
+            }
+            $data['photo_path'] = $request->file('photo')->store('students', 'public');
+        }
 
         $student->update($data);
 
