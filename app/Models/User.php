@@ -12,6 +12,10 @@ class User extends Authenticatable
 
     public $timestamps = false;
 
+    protected $primaryKey = 'batch_no';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     /**
      * The attributes that are mass assignable.
      *

@@ -71,7 +71,7 @@ class StudentsController extends Controller
         }
 
         Issue::create([
-            'user_id' => $student->id,
+            'user_batch_no' => $student->batch_no,
             'Accession_Number' => $accession,
             'issue_date' => $issueDate->toDateString(),
             'due_date' => $dueDate->toDateString(),
@@ -84,7 +84,7 @@ class StudentsController extends Controller
 
     public function returnBook(Request $request, User $student, Issue $issue)
     {
-        if ($issue->user_id !== $student->id) {
+        if ($issue->user_batch_no !== $student->batch_no) {
             abort(404);
         }
 
@@ -160,7 +160,7 @@ class StudentsController extends Controller
     {
         $data = $request->validate([
             'student_name' => ['required','string','max:255'],
-            'batch_no' => ['required','string','max:255', Rule::unique('users','batch_no')->ignore($student->id)],
+            'batch_no' => ['required','string','max:255', Rule::unique('users','batch_no')->ignore($student->batch_no, 'batch_no')],
             'email' => ['nullable','email','max:255'],
             'faculty' => ['nullable','string','max:255'],
         ]);

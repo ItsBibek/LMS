@@ -102,7 +102,7 @@ class BooksController extends Controller
         $dueDate = (clone $issueDate)->addMonthsNoOverflow(6);
 
         Issue::create([
-            'user_id' => $student->id,
+            'user_batch_no' => $student->batch_no,
             'Accession_Number' => $book->Accession_Number,
             'issue_date' => $issueDate->toDateString(),
             'due_date' => $dueDate->toDateString(),

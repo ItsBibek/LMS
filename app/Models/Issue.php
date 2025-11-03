@@ -10,7 +10,7 @@ class Issue extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'user_batch_no',
         'Accession_Number',
         'issue_date',
         'due_date',
@@ -20,7 +20,7 @@ class Issue extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_batch_no', 'batch_no');
     }
 
     public function book()
