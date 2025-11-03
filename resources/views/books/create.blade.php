@@ -13,15 +13,15 @@
    @csrf
    <div>
     <label class="block text-sm font-medium text-slate-700">Accession Number</label>
-    <input type="text" name="Accession_Number" value="{{ old('Accession_Number') }}" class="mt-1 w-full rounded-md border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g. ACC-0001" />
+    <input type="text" name="Accession_Number" value="{{ old('Accession_Number') }}" class="mt-1 w-full rounded-md border border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g. ACC-0001" />
    </div>
    <div>
     <label class="block text-sm font-medium text-slate-700">Title</label>
-    <input type="text" name="Title" value="{{ old('Title') }}" class="mt-1 w-full rounded-md border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" />
+    <input type="text" name="Title" value="{{ old('Title') }}" class="mt-1 w-full rounded-md border border -slate-300 focus:border-indigo-500 focus:ring-indigo-500" />
    </div>
    <div>
     <label class="block text-sm font-medium text-slate-700">Author</label>
-    <input type="text" name="Author" value="{{ old('Author') }}" class="mt-1 w-full rounded-md border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" />
+    <input type="text" name="Author" value="{{ old('Author') }}" class="mt-1 w-full rounded-md border border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" />
    </div>
    <div class="pt-2">
     <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700">Save</button>
