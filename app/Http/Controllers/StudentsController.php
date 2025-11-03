@@ -9,8 +9,6 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class StudentsController extends Controller
 {
@@ -148,11 +146,6 @@ class StudentsController extends Controller
             'faculty' => ['nullable','string','max:255'],
         ]);
 
-        // Ensure 'name' is populated for users table schema
-        $data['name'] = $data['student_name'];
-        // Generate a random password to satisfy non-nullable schema
-        $data['password'] = Hash::make(Str::random(24));
-
         $student = User::create($data);
 
         return redirect()->route('students.manage')->with('status', 'Student added successfully.');
@@ -167,13 +160,10 @@ class StudentsController extends Controller
     {
         $data = $request->validate([
             'student_name' => ['required','string','max:255'],
-            'batch_no' => ['required','string','max:255', Rule::unique('users','batch_no')->ignore($student->getKey(), $student->getRouteKeyName())],
+            'batch_no' => ['required','string','max:255', Rule::unique('users','batch_no')->ignore($student->id)],
             'email' => ['nullable','email','max:255'],
             'faculty' => ['nullable','string','max:255'],
         ]);
-
-        // Keep 'name' in sync with 'student_name'
-        $data['name'] = $data['student_name'];
 
         $student->update($data);
 
