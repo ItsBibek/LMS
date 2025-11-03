@@ -13,7 +13,7 @@
    <div class="md:col-span-5">
     <input type="text" name="q" value="{{ $q }}" placeholder="Enter accession number"
            autofocus autocomplete="off" inputmode="numeric"
-           class="w-full rounded-md border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" />
+           class="w-full rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
    </div>
    <div class="md:col-span-1 flex gap-2">
     <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700 w-full">Search</button>
@@ -75,7 +75,9 @@
        </div>
        <div class="flex items-start px-6 py-4">
         <div class="w-40 text-sm text-slate-500">Issue Date</div>
-        <div class="flex-1 text-sm font-medium text-slate-800">{{ $currentIssue->issue_date ?? '-' }}</div>
+        <div class="flex-1">
+         <span class="inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-800 bg-white">{{ $currentIssue->issue_date ?? '-' }}</span>
+        </div>
        </div>
        <div class="flex items-start px-6 py-4">
         <div class="w-40 text-sm text-slate-500">Due Date</div>
@@ -100,11 +102,11 @@
          <input type="hidden" name="accession" value="{{ $book->Accession_Number }}" />
          <div class="md:col-span-1">
           <label class="block text-sm font-medium text-slate-700">Batch Number</label>
-          <input type="text" name="batch_no" value="{{ old('batch_no') }}" placeholder="e.g. BATCH-2025-001" class="mt-1 w-full rounded-md border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" />
+          <input type="text" name="batch_no" value="{{ old('batch_no') }}" placeholder="e.g. BATCH-2025-001" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
          </div>
          <div class="md:col-span-1">
           <label class="block text-sm font-medium text-slate-700">Issue Date (optional)</label>
-          <input type="date" name="issue_date" value="{{ old('issue_date') }}" class="mt-1 w-full rounded-md border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" />
+          <input type="date" name="issue_date" value="{{ old('issue_date') }}" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
          </div>
          <div class="md:col-span-1 flex items-end">
           <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700 w-full">Issue Book</button>
