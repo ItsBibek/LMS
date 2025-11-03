@@ -14,15 +14,15 @@
    @method('PATCH')
    <div class="md:col-span-2">
     <label class="block text-sm font-medium text-slate-700">Accession Number</label>
-    <input type="text" name="Accession_Number" value="{{ old('Accession_Number', $book->Accession_Number) }}" class="mt-1 w-full rounded-md border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required />
+    <input type="text" name="Accession_Number" value="{{ old('Accession_Number', $book->Accession_Number) }}" class="mt-1 w-full rounded-md border border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required />
    </div>
    <div class="md:col-span-2">
     <label class="block text-sm font-medium text-slate-700">Title</label>
-    <input type="text" name="Title" value="{{ old('Title', $book->Title) }}" class="mt-1 w-full rounded-md border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required />
+    <input type="text" name="Title" value="{{ old('Title', $book->Title) }}" class="mt-1 w-full rounded-md border border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" required />
    </div>
    <div class="md:col-span-2">
     <label class="block text-sm font-medium text-slate-700">Author</label>
-    <input type="text" name="Author" value="{{ old('Author', $book->Author) }}" class="mt-1 w-full rounded-md border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" />
+    <input type="text" name="Author" value="{{ old('Author', $book->Author) }}" class="mt-1 w-full rounded-md border border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" />
    </div>
    <div class="md:col-span-2 flex items-center gap-2 pt-2">
     <button type="submit" class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700">Update</button>

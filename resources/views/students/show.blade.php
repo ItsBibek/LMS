@@ -7,7 +7,7 @@
 @section('content')
  <div class="flex items-center justify-end mb-4">
   <form method="GET" action="{{ route('students.index') }}" class="flex items-center gap-2">
-   <input type="text" name="batch" placeholder="Search batch no..." class="rounded-md border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" />
+   <input type="text" name="batch" placeholder="Search batch no..." class="rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
    <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-white text-sm font-medium hover:bg-indigo-700">Search</button>
   </form>
  </div>
@@ -39,11 +39,11 @@
      @csrf
      <div>
       <label class="block text-sm font-medium text-slate-700">Accession Number</label>
-      <input type="text" name="accession" value="{{ old('accession') }}" class="mt-1 w-full rounded-md border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g. ACC-0001" />
+      <input type="text" name="accession" value="{{ old('accession') }}" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. ACC-0001" />
      </div>
      <div>
       <label class="block text-sm font-medium text-slate-700">Issue Date (optional)</label>
-      <input type="date" name="issue_date" value="{{ old('issue_date') }}" class="mt-1 w-full rounded-md border-slate-300 focus:border-indigo-500 focus:ring-indigo-500" />
+      <input type="date" name="issue_date" value="{{ old('issue_date') }}" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
      </div>
      <div>
       <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700">Issue Book</button>
@@ -71,9 +71,9 @@
       <tbody class="bg-white divide-y divide-slate-200">
        @forelse($student->currentIssues as $issue)
         <tr>
-         <td class="px-6 py-3 text-sm">{{ $issue->Accession_Number }}</td>
+         <td class="px-6 py-3 text-sm"><span class="inline-flex items-center rounded-md border border-slate-300 px-2.5 py-1 text-sm bg-white">{{ $issue->Accession_Number }}</span></td>
          <td class="px-6 py-3 text-sm">{{ optional($issue->book)->Title ?? '-' }}</td>
-         <td class="px-6 py-3 text-sm">{{ $issue->issue_date }}</td>
+         <td class="px-6 py-3 text-sm"><span class="inline-flex items-center rounded-md border border-slate-300 px-2.5 py-1 text-sm bg-white">{{ $issue->issue_date }}</span></td>
          <td class="px-6 py-3 text-sm">{{ $issue->due_date }}</td>
          <td class="px-6 py-3 text-right">
           <form method="POST" action="{{ route('students.return', [$student, $issue->id]) }}" onsubmit="return confirm('Return this book?')">
