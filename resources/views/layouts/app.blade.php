@@ -34,7 +34,7 @@
     <header class="bg-white border-b border-slate-200">
      <div class="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3 md:hidden">
-       <img src="{{ asset('images/academia-logo.png') }}" alt="Academia International College" class="w-10 h-10 rounded-lg object-cover" />
+       <!--<img src="{{ asset('images/academia-logo.png') }}" alt="Academia International College" class="w-10 h-10 rounded-lg object-cover" />-->
        <div>
         <h1 class="text-base font-semibold">@yield('header', 'Library Management System')</h1>
        </div>

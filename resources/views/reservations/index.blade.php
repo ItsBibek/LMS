@@ -49,17 +49,25 @@
        </td>
        <td class="px-6 py-3 text-sm">{{ $expires->toDayDateTimeString() }}</td>
        <td class="px-6 py-3 text-sm text-right">
-        @if($r->status === 'pending' && $expires->isFuture())
-         <form method="POST" action="{{ route('reservations.issue', $r) }}" class="inline">
+        @if($r->status === 'pending')
+         @if($expires->isFuture())
+          <form method="POST" action="{{ route('reservations.issue', $r) }}" class="inline">
+           @csrf
+           <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-white text-sm font-medium hover:bg-indigo-700">Issue</button>
+          </form>
+         @endif
+         <form method="POST" action="{{ route('reservations.destroy', $r) }}" class="inline" onsubmit="return confirm('Decline this reservation?')">
           @csrf
-          <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-white text-sm font-medium hover:bg-indigo-700">Issue</button>
+          @method('DELETE')
+          <button type="submit" class="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-50 ml-2">Decline</button>
+         </form>
+        @else
+         <form method="POST" action="{{ route('reservations.destroy', $r) }}" class="inline" onsubmit="return confirm('Delete this reservation record?')">
+          @csrf
+          @method('DELETE')
+          <button type="submit" class="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-50 ml-2">Delete</button>
          </form>
         @endif
-        <form method="POST" action="{{ route('reservations.destroy', $r) }}" class="inline" onsubmit="return confirm('Remove this reservation?')">
-         @csrf
-         @method('DELETE')
-         <button type="submit" class="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-50 ml-2">Delete</button>
-        </form>
        </td>
       </tr>
      @empty

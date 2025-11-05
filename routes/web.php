@@ -51,6 +51,7 @@ Route::middleware('admin')->group(function () {
 
     Route::get('/books', [BooksController::class, 'index'])->name('books.index');
     Route::post('/books/issue', [BooksController::class, 'issue'])->name('books.issue');
+    Route::post('/books/issues/{issue}/return', [BooksController::class, 'return'])->name('books.return');
     Route::get('/books/create', [BooksController::class, 'create'])->name('books.create');
     Route::post('/books', [BooksController::class, 'store'])->name('books.store');
     Route::get('/books/{book}/edit', [BooksController::class, 'edit'])->name('books.edit');

@@ -62,20 +62,38 @@
        <div class="text-lg font-semibold text-slate-800">{{ $book->Accession_Number }}</div>
       </div>
       <div class="flex items-center gap-2">
-       @if(!empty($isIssued) && $isIssued)
-        <span class="inline-flex items-center rounded-md bg-rose-50 text-rose-700 px-2 py-1 text-xs font-medium">Issued</span>
-       @elseif(isset($activeReservation) && $activeReservation)
-        @php($expires = \Carbon\Carbon::parse($activeReservation->reserved_at)->addHours(24))
-        <span class="inline-flex items-center rounded-md bg-amber-50 text-amber-700 px-2 py-1 text-xs font-medium">Reserved by {{ $activeReservation->user_batch_no }} until {{ $expires->toDayDateTimeString() }}</span>
-       @else
-        <span class="inline-flex items-center rounded-md bg-emerald-50 text-emerald-700 px-2 py-1 text-xs font-medium">Available</span>
-       @endif
-       <a href="{{ route('books.edit', $book->Accession_Number) }}" class="inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium hover:bg-slate-50">Edit</a>
-       <form method="POST" action="{{ route('books.destroy', $book->Accession_Number) }}" onsubmit="return confirm('Delete this book? This will not remove past issue history. Continue?')">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="inline-flex items-center rounded-md bg-rose-600 px-3 py-1.5 text-white text-xs font-medium hover:bg-rose-700">Delete</button>
-       </form>
+      @if(!empty($isIssued) && $isIssued)
+       <span class="inline-flex items-center rounded-md bg-rose-50 text-rose-700 px-2 py-1 text-xs font-medium">Issued</span>
+      @elseif(isset($activeReservation) && $activeReservation)
+       @php($expires = \Carbon\Carbon::parse($activeReservation->reserved_at)->addHours(24))
+       <span class="inline-flex items-center rounded-md bg-amber-50 text-amber-700 px-2 py-1 text-xs font-medium">Reserved by {{ $activeReservation->user_batch_no }} until {{ $expires->toDayDateTimeString() }}</span>
+      @else
+       <span class="inline-flex items-center rounded-md bg-emerald-50 text-emerald-700 px-2 py-1 text-xs font-medium">Available</span>
+      @endif
+       <div class="relative">
+        <button type="button" id="book-actions-btn" class="inline-flex items-center justify-center rounded-md border border-slate-300 px-2.5 py-1.5 text-xs font-medium hover:bg-slate-50">
+         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        </button>
+        <div id="book-actions-menu" class="hidden absolute right-0 mt-2 w-40 rounded-md border border-slate-200 bg-white shadow-lg z-10">
+         <a href="{{ route('books.edit', $book->Accession_Number) }}" class="block px-3 py-2 text-sm hover:bg-slate-50">Edit</a>
+         <form method="POST" action="{{ route('books.destroy', $book->Accession_Number) }}" onsubmit="return confirm('Delete this book? This will not remove past issue history. Continue?')">
+          @csrf
+          @method('DELETE')
+          <button type="submit" class="w-full text-left px-3 py-2 text-sm text-rose-700 hover:bg-rose-50">Delete</button>
+         </form>
+        </div>
+       </div>
+       <script>
+        (function(){
+          var btn = document.getElementById('book-actions-btn');
+          var menu = document.getElementById('book-actions-menu');
+          function hide(){ if(menu) menu.classList.add('hidden'); }
+          function toggle(e){ e.stopPropagation(); if(menu) menu.classList.toggle('hidden'); }
+          if(btn){ btn.addEventListener('click', toggle); }
+          document.addEventListener('click', function(e){ if(!menu || !btn) return; if(!menu.contains(e.target) && e.target!==btn){ hide(); } });
+          document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ hide(); } });
+        })();
+       </script>
       </div>
      </div>
      <div class="divide-y divide-slate-200">
@@ -91,9 +109,15 @@
 
      @if(!empty($isIssued) && $isIssued && isset($currentIssue) && $currentIssue)
       <div class="divide-y divide-slate-200">
-       <div class="flex items-start px-6 py-4 bg-amber-50">
+       <div class="flex items-center px-6 py-4 bg-amber-50">
         <div class="w-40 text-sm font-semibold text-amber-800">Issued To</div>
         <div class="flex-1 text-sm text-amber-900">{{ $currentIssue->user->student_name ?? '-' }} ({{ $currentIssue->user->batch_no ?? '-' }})</div>
+        <div>
+         <form method="POST" action="{{ route('books.return', $currentIssue) }}" onsubmit="return confirm('Mark this book as returned?')">
+          @csrf
+          <button type="submit" class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-1.5 text-white text-sm font-medium hover:bg-emerald-700">Return</button>
+         </form>
+        </div>
        </div>
        <div class="flex items-start px-6 py-4">
         <div class="w-40 text-sm text-slate-500">Issue Date</div>

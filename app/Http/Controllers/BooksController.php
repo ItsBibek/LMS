@@ -214,4 +214,23 @@ class BooksController extends Controller
         $book->delete();
         return redirect()->route('books.index')->with('status', 'Book deleted successfully.');
     }
+
+    public function return(Request $request, Issue $issue)
+    {
+        if ($issue->return_date === null) {
+            $today = Carbon::now();
+            $due = Carbon::parse($issue->due_date);
+            $lateDays = max(0, $due->diffInDays($today, false));
+            $finePerDay = 2; // Rs. 2 per day
+            $fine = $lateDays > 0 ? $lateDays * $finePerDay : 0;
+
+            $issue->update([
+                'return_date' => $today->toDateString(),
+                'fine' => $fine,
+            ]);
+        }
+
+        return redirect()->route('books.index', ['q' => $issue->Accession_Number])
+            ->with('status', 'Book returned successfully.');
+    }
 }

@@ -12,7 +12,7 @@
  <div class="mb-8">
   <div class="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-indigo-50 via-white to-sky-50">
    <div class="px-6 py-6 sm:px-8 sm:py-8 flex items-start sm:items-center gap-5">
-    <img src="{{ asset('images/academia-logo.png') }}" alt="Academia International College" class="w-14 h-14 rounded-xl object-cover ring-1 ring-slate-200" />
+    <!-- <img src="{{ asset('images/academia-logo.png') }}" alt="Academia International College" class="w-14 h-14 rounded-xl object-cover ring-1 ring-slate-200" /> -->
     <div class="flex-1">
      <h2 class="text-lg sm:text-xl font-semibold text-slate-800">Welcome to Academia International College Library</h2>
      <p class="mt-1 text-sm text-slate-600">Search books, manage students, and track issues with a clean, fast interface.</p>
