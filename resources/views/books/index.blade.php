@@ -5,14 +5,14 @@
 @section('header_actions')
  <a href="{{ route('books.create') }}" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700">Add Book</a>
 @endsection
-@section('subheader', 'Search by accession number')
+@section('subheader', 'Search by accession number or part of a title')
 
 @section('content')
  <div class="bg-white border border-slate-200 rounded-xl p-4 md:p-6">
   <form method="GET" action="{{ route('books.index') }}" class="grid grid-cols-1 md:grid-cols-6 gap-3">
    <div class="md:col-span-5">
-    <input type="text" name="q" value="{{ $q }}" placeholder="Enter accession number"
-           autofocus autocomplete="off" inputmode="numeric"
+    <input type="text" name="q" value="{{ $q }}" placeholder="Accession number or part of title (e.g. 'numerical')"
+           autofocus autocomplete="off"
            class="w-full rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
    </div>
    <div class="md:col-span-1 flex gap-2">
@@ -32,7 +32,26 @@
 
   <div class="mt-6">
    @if($q === '')
-    <div class="text-center text-slate-500 text-sm py-8">Type the exact accession number and press Search.</div>
+    <div class="text-center text-slate-500 text-sm py-8">Type an accession number or any part of a book title and press Search.</div>
+   @endif
+
+   @if(isset($matches) && $matches && $matches->count() > 0)
+    <div class="bg-white border border-slate-200 rounded-xl">
+     <div class="px-4 py-3 border-b border-slate-200">
+      <h3 class="text-sm font-semibold text-slate-700">Found {{ $matches->count() }} matching title{{ $matches->count() === 1 ? '' : 's' }}</h3>
+     </div>
+     <ul class="divide-y divide-slate-200">
+      @foreach($matches as $m)
+       <li class="px-4 md:px-6 py-3 hover:bg-slate-50 flex items-center justify-between">
+        <div>
+         <div class="text-sm font-medium text-slate-800">{{ $m->Title ?? '-' }}</div>
+         <div class="text-xs text-slate-500">Accession: {{ $m->Accession_Number }} @if($m->Author) · Author: {{ $m->Author }} @endif</div>
+        </div>
+        <a href="{{ route('books.index', ['q' => $m->Accession_Number]) }}" class="inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium hover:bg-slate-50">View</a>
+       </li>
+      @endforeach
+     </ul>
+    </div>
    @endif
 
    @if(isset($book) && $book)
@@ -45,6 +64,9 @@
       <div class="flex items-center gap-2">
        @if(!empty($isIssued) && $isIssued)
         <span class="inline-flex items-center rounded-md bg-rose-50 text-rose-700 px-2 py-1 text-xs font-medium">Issued</span>
+       @elseif(isset($activeReservation) && $activeReservation)
+        @php($expires = \Carbon\Carbon::parse($activeReservation->reserved_at)->addHours(24))
+        <span class="inline-flex items-center rounded-md bg-amber-50 text-amber-700 px-2 py-1 text-xs font-medium">Reserved by {{ $activeReservation->user_batch_no }} until {{ $expires->toDayDateTimeString() }}</span>
        @else
         <span class="inline-flex items-center rounded-md bg-emerald-50 text-emerald-700 px-2 py-1 text-xs font-medium">Available</span>
        @endif
@@ -94,30 +116,48 @@
       </div>
      @endif
 
-     @if(empty($isIssued) || !$isIssued)
+     @if((empty($isIssued) || !$isIssued))
       <div class="px-6 py-5 border-t border-slate-200">
        <h3 class="text-sm font-semibold text-slate-700">Issue this Book</h3>
-       <form method="POST" action="{{ route('books.issue') }}" class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-        @csrf
-         <input type="hidden" name="accession" value="{{ $book->Accession_Number }}" />
-         <div class="md:col-span-1">
-          <label class="block text-sm font-medium text-slate-700">Batch Number</label>
-          <input type="text" name="batch_no" value="{{ old('batch_no') }}" placeholder="e.g. BATCH-2025-001" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+       @if(isset($activeReservation) && $activeReservation)
+        @php($expires = \Carbon\Carbon::parse($activeReservation->reserved_at)->addHours(24))
+        <div class="mt-3 flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+         <div class="text-sm text-amber-700">Reserved by <strong>{{ $activeReservation->user_batch_no }}</strong> until {{ $expires->toDayDateTimeString() }}.</div>
+         <div class="flex gap-2">
+          <form method="POST" action="{{ route('reservations.issue', $activeReservation) }}">
+           @csrf
+           <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700">Issue to {{ $activeReservation->user_batch_no }}</button>
+          </form>
+          <form method="POST" action="{{ route('reservations.destroy', $activeReservation) }}" onsubmit="return confirm('Delete this reservation?')">
+           @csrf
+           @method('DELETE')
+           <button type="submit" class="inline-flex items-center justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-50">Delete Reservation</button>
+          </form>
          </div>
-         <div class="md:col-span-1">
-          <label class="block text-sm font-medium text-slate-700">Issue Date (optional)</label>
-          <input type="date" name="issue_date" value="{{ old('issue_date') }}" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-         </div>
-         <div class="md:col-span-1 flex items-end">
-          <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700 w-full">Issue Book</button>
-         </div>
-        </form>
-       </div>
-      @endif
+        </div>
+       @else
+        <form method="POST" action="{{ route('books.issue') }}" class="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+         @csrf
+          <input type="hidden" name="accession" value="{{ $book->Accession_Number }}" />
+          <div class="md:col-span-1">
+           <label class="block text-sm font-medium text-slate-700">Batch Number</label>
+           <input type="text" name="batch_no" value="{{ old('batch_no') }}" placeholder="e.g. 77A-001" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+          </div>
+          <div class="md:col-span-1">
+           <label class="block text-sm font-medium text-slate-700">Issue Date (optional)</label>
+           <input type="date" name="issue_date" value="{{ old('issue_date') }}" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+          </div>
+          <div class="md:col-span-1 flex items-end">
+           <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700 w-full">Issue Book</button>
+          </div>
+         </form>
+       @endif
+      </div>
+     @endif
     </div>
    @else
-    @if($q !== '')
-     <div class="text-center text-slate-500 text-sm py-8">No books found for accession "{{ $q }}".</div>
+    @if($q !== '' && (!isset($matches) || $matches->count() === 0))
+     <div class="text-center text-slate-500 text-sm py-8">No books found for "{{ $q }}".</div>
     @endif
    @endif
   </div>

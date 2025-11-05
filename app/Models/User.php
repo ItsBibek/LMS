@@ -27,6 +27,7 @@ class User extends Authenticatable
         'faculty',
         'email',
         'photo_path',
+        'password',
     ];
 
     /**
@@ -35,7 +36,8 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        
+        'password',
+        'remember_token',
     ];
 
     /**
@@ -44,7 +46,7 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        
+        'email_verified_at' => 'datetime',
     ];
 
     public function getRouteKeyName()

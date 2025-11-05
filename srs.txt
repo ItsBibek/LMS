@@ -1,0 +1,143 @@
+Library Management System (LMS) - Software Requirements Specification (SRS)
+
+1. Introduction
+1.1 Purpose
+This document provides a detailed description of the functional and non-functional requirements for the College Library Management System (LMS). It is intended for the development team, project stakeholders, and college administration to serve as a definitive guide for what the system will accomplish.
+1.2 Scope
+The LMS is a comprehensive web-based solution designed to automate the entire suite of library operations, replacing an inefficient manual system. It will manage books, members, and transactions, while providing distinct, role-based interfaces for librarians and students. The system aims to enhance efficiency, accuracy, and user accessibility.
+1.3 Definitions, Acronyms, and Abbreviations
+•	LMS: Library Management System.
+•	Admin/Librarian: The primary user with full system access for all management tasks.
+•	Student: A library member who can borrow books and use the self-service portal.
+•	Accession Number: A unique identifier for each book copy, designed to be compatible with barcode labels.
+•	Batch Number: A unique identifier for each student (Eg: AC-078CSIT34)
+•	Transaction: A record of a book issue, return event.
+2. Overall Description
+2.1 Product Perspective
+The LMS will be a new, self-contained web application. It will integrate with the existing college portal for student authentication to provide a seamless login experience. The system will be developed on a MySQL/PHP.
+2.2 User Classes and Characteristics
+•	Administrator/Librarian: This user is responsible for all data management. The system must be intuitive and efficient for them, as they are not expected to be highly technical. 
+•	Student: This user accesses the system to view their account and search for books. The interface must be simple and clear, providing easy access to their personal borrowing information (like: currently holding books, history) through their existing college login.
+2.3 Operating Environment
+•	Software: The system will operate on a server running a Windows OS with XAMPP (Apache, MySQL, PHP). It will be accessible through modern web browsers like Chrome, Firefox, and Safari.
+•	Hardware: Standard desktop computers for library staff and barcode scanners for efficient book and student ID processing.
+2.4 Design and Implementation Constraints
+•	The application shall be developed using the PHP programming language, preferably with the Laravel framework, and use MySQL for the database.
+•	The user interface shall be built with HTML, CSS, JavaScript, and the Bootstrap framework to ensure a responsive design.
+2.5 Assumptions and Dependencies
+•	It is assumed that the college will provide server infrastructure for hosting the application.
+•	The project depends on the availability of student data (e.g., Batch Number, name, email) from the college's central system for authentication and profile setup.
+3. System Features and Functional Requirements
+Admin Portal:
+3.1 Book Management
+The system shall:
+•	Allow an Administrator to add new book records, including Title, Author, ISBN, Accession Number, and Status.
+•	Allow an Administrator to edit the details of any existing book record.
+•	Allow an Administrator to delete a book record from the system.
+•	Allow all users to search the book catalog by Title, Author, or Accession Number.
+•	Display the full details and current status (Available/Issued) for any book.
+•	Maintain and display a complete history of all issue and return transactions for each book.
+3.2 Student Management
+The system shall:
+•	Allow an Administrator to search for a student by Name or by scanning a Student ID.
+•	Display a detailed student profile containing:
+o	Personal details.
+o	List of currently issued books.
+o	History of returned books.
+o	Total outstanding fines.
+•	Automatically calculate and display the time remaining in a student's 6-month validity period.
+
+3.3 Transaction Processing
+The system shall:
+•	Allow an Administrator to issue a book by scanning a Student ID and a Book Barcode, creating a transaction and updating the book's status.
+•	Allow an Administrator to return a book by scanning the Book Barcode, automatically updating the book's status to "Available".
+•	Automatically calculate a fine of Rs. 2 per day if a book is returned after its due date.
+•	Allow an Administrator to view logs of all reserved books and the student who reserved it and allow operations such as: Accept or Delete the reservation of book.
+3.4 Student Portal
+The system shall:
+•	Allow students to log in using their college portal credentials.
+•	Allow students to view their personal profile and currently issued books with due dates.
+•	Allow students to check their current fine amount.
+•	Allow students to view their complete borrowing history.
+•	Allow students to search the available book catalog by Title or Author.
+
+3.5 Reservations
+The system shall:
+•	Allow a student to reserve a book for 24 hours when it is available, preventing others from reserving it within that window.
+•	Auto-expire pending reservations after 24 hours; expired reservations are not eligible for issue.
+•	Allow a student to cancel their own pending reservation.
+•	Allow an Administrator to view, issue from, decline, or remove reservations.
+•	Enforce that only the reserving student can issue the reserved book during the active reservation window.
+
+3.6 Dashboard & Reporting
+The system shall:
+•	Provide an Administrator dashboard with counts of total books, total members, active loans, and overdue items.
+•	Surface per-book issuance state and accrued fine estimate during searches.
+
+3.7 Authentication & Authorization
+The system shall:
+•	Provide an Administrator login using credentials configured by the institution (initial implementation uses server-configured credentials).
+•	Provide a Student login via email and Batch Number, maintaining session state to access the student portal.
+•	Protect Administrator routes with admin-only middleware and Student routes with student-only middleware.
+
+3.8 Student and Book Search & Scanning Support
+The system shall:
+•	Support searching books by Accession Number (with numeric-only normalization) or by partial Title.
+•	Support searching students by Batch Number (scanned values normalized) or by exact match.
+•	Support barcode scanners for Accession Number and Student ID input via standard keyboard wedge devices.
+
+4. External Interface Requirements
+4.1 User Interfaces
+The system shall feature a clean, intuitive, and responsive user interface that works effectively on desktop computers, tablets, and mobile phones. The Administrator interface will be dashboard-driven allowing to perform major CRUD operations, while the student portal will be simplified and focused on self-service tasks.
+4.2 Hardware Interfaces
+The system must support interaction with standard USB barcode scanners for efficient data entry.
+4.3 Software Interfaces
+The system shall integrate with the existing college portal to allow for student authentication using their existing credentials.
+4.4 Communications Interfaces
+The system shall be configured to send email notifications via an SMTP server for functionalities such as reminder alerts.
+
+5. Non-Functional Requirements
+5.1 Performance
+•	Search operations for books and students should complete within 2 seconds for up to 10,000 records.
+•	Dashboard metrics should load within 2 seconds under normal load.
+5.2 Security
+•	All form inputs shall be validated server-side. CSRF protection shall be enabled for web routes.
+•	Administrator and Student sessions shall be isolated and protected; privileged routes are guarded by middleware.
+5.3 Reliability & Availability
+•	System shall be available during library operating hours with daily database backups recommended.
+5.4 Maintainability
+•	The codebase follows Laravel MVC structure with Controllers, Models, Migrations, Middleware, and Blade templates.
+5.5 Usability
+•	Interfaces shall be optimized for keyboard input and barcode scanning.
+
+6. Data Model Overview
+6.1 Entities
+•	Book (Accession_Number [PK, string], Title, Author)
+•	User (batch_no [PK, string], student_name, faculty, email, photo_path)
+•	Issue (id [PK], user_batch_no [FK→User.batch_no], Accession_Number [FK→Book.Accession_Number], issue_date, due_date, return_date, fine)
+•	Reservation (id [PK], user_batch_no [FK→User.batch_no], Accession_Number [FK→Book.Accession_Number], reserved_at [datetime], status [pending|issued|declined|expired])
+6.2 Relationships
+•	User 1–N Issue
+•	Book 1–N Issue
+•	User 1–N Reservation
+•	Book 1–N Reservation
+
+7. System Architecture
+•	Framework: Laravel 9 (PHP 8.0+), Blade views, Eloquent ORM, Carbon for date calculations.
+•	Web routes protected by custom middleware: `admin` and `student`.
+•	Storage: Public disk used for student photo uploads.
+•	Views: Separate layouts for admin and student portals; CRUD views for books and students; reservation and dashboard views.
+
+8. Dependencies and Packages
+•	laravel/framework ^9.19
+•	php ^8.0.2
+•	doctrine/dbal ^3.10 (schema changes)
+•	laravel/sanctum ^3.0 (available, not currently used by implemented features)
+•	laravel/tinker ^2.7
+
+9. Implementation Notes
+•	Loan period defaults to 6 months; fines accrue at Rs. 2/day after due date and are computed on return.
+•	Accession Number normalization (numeric-only) is applied for scans; student Batch Number normalization is supported.
+•	Admin credentials are server-configured; consider integrating with institutional SSO in future.
+
+

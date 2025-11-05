@@ -25,6 +25,8 @@
      <a href="{{ route('students.index') }}" class="block px-3 py-2 rounded-md hover:bg-slate-50 {{ request()->routeIs('students.index') ? 'bg-slate-100 text-indigo-700' : 'text-slate-700' }}">Student Search</a>
      <a href="{{ route('students.manage') }}" class="block px-3 py-2 rounded-md hover:bg-slate-50 {{ request()->routeIs('students.manage') || request()->routeIs('students.create') || request()->routeIs('students.edit') ? 'bg-slate-100 text-indigo-700' : 'text-slate-700' }}">Manage Students</a>
 
+     <a href="{{ route('reservations.index') }}" class="block px-3 py-2 rounded-md hover:bg-slate-50 {{ request()->routeIs('reservations.index') ? 'bg-slate-100 text-indigo-700' : 'text-slate-700' }}">Reservations</a>
+
     </nav>
    </aside>
 
@@ -43,6 +45,12 @@
       </div>
       <div class="flex items-center gap-2">
        @yield('header_actions')
+       @if(session('is_admin'))
+        <form method="POST" action="{{ route('admin.logout') }}">
+         @csrf
+         <button type="submit" class="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-50">Logout</button>
+        </form>
+       @endif
       </div>
      </div>
     </header>

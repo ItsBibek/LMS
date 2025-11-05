@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Issue;
 use App\Models\User;
+use App\Models\Reservation;
 use Carbon\Carbon;
 
 class BooksController extends Controller
@@ -35,15 +36,33 @@ class BooksController extends Controller
         $normalized = $q !== '' ? preg_replace('/\D+/', '', $q) : '';
 
         $book = null;
+        $matches = collect();
         $isIssued = false;
         $currentIssue = null;
         $lateDays = 0;
         $accruedFine = 0;
+
         if ($q !== '') {
+            // 1) Try accession number first (supports numeric-only or raw)
             $book = Book::query()
                 ->where('Accession_Number', $normalized)
                 ->orWhere('Accession_Number', $q)
                 ->first();
+
+            // 2) If not found by accession, try partial Title match (case-insensitive)
+            if (!$book) {
+                $matches = Book::query()
+                    ->where('Title', 'LIKE', '%'.$q.'%')
+                    ->orderBy('Title')
+                    ->limit(50)
+                    ->get();
+
+                // If exactly one match, show details directly
+                if ($matches->count() === 1) {
+                    $book = $matches->first();
+                    $matches = collect();
+                }
+            }
 
             if ($book) {
                 $currentIssue = Issue::with('user')
@@ -57,16 +76,36 @@ class BooksController extends Controller
                     $lateDays = max(0, $due->diffInDays($today, false));
                     $accruedFine = $lateDays * 2; // Rs. 2 per day
                 }
+
+                // Reservation status (pending and not expired)
+                // Auto-decline expired reservations (>24h)
+                $pendingRes = Reservation::where('Accession_Number', $book->Accession_Number)
+                    ->where('status', 'pending')
+                    ->orderBy('reserved_at')
+                    ->get();
+                foreach ($pendingRes as $res) {
+                    if (Carbon::parse($res->reserved_at)->addHours(24)->isPast()) {
+                        $res->status = 'expired';
+                        $res->save();
+                    }
+                }
+                // After expiring old ones, pick the first active pending reservation (if any)
+                $activeReservation = Reservation::where('Accession_Number', $book->Accession_Number)
+                    ->where('status', 'pending')
+                    ->orderBy('reserved_at')
+                    ->first();
             }
         }
 
         return view('books.index', [
             'book' => $book,
+            'matches' => $matches,
             'q' => $q,
             'isIssued' => $isIssued,
             'currentIssue' => $currentIssue,
             'lateDays' => $lateDays,
             'accruedFine' => $accruedFine,
+            'activeReservation' => isset($activeReservation) ? $activeReservation : null,
         ]);
     }
 
@@ -98,6 +137,22 @@ class BooksController extends Controller
             return back()->withErrors(['accession' => 'This book is currently issued.'])->withInput();
         }
 
+        // Respect reservations: if there is a pending, unexpired reservation, only that student can issue
+        $activeReservation = Reservation::where('Accession_Number', $book->Accession_Number)
+            ->where('status', 'pending')
+            ->orderBy('reserved_at')
+            ->first();
+        if ($activeReservation) {
+            // expire if older than 24h
+            if (Carbon::parse($activeReservation->reserved_at)->addHours(24)->isPast()) {
+                $activeReservation->status = 'expired';
+                $activeReservation->save();
+            } else if ($activeReservation->user_batch_no !== $student->batch_no) {
+                $expiresAt = Carbon::parse($activeReservation->reserved_at)->addHours(24);
+                return back()->withErrors(['accession' => 'This book is reserved by '.$activeReservation->user_batch_no.' until '.$expiresAt->toDayDateTimeString().'.'])->withInput();
+            }
+        }
+
         $issueDate = isset($data['issue_date']) ? Carbon::parse($data['issue_date']) : Carbon::now();
         $dueDate = (clone $issueDate)->addMonthsNoOverflow(6);
 
@@ -109,6 +164,12 @@ class BooksController extends Controller
             'return_date' => null,
             'fine' => 0,
         ]);
+
+        // If issuing from an active reservation for this student, mark it issued
+        if (isset($activeReservation) && $activeReservation && $activeReservation->status === 'pending' && $activeReservation->user_batch_no === $student->batch_no) {
+            $activeReservation->status = 'issued';
+            $activeReservation->save();
+        }
 
         return redirect()->route('books.index', ['q' => $book->Accession_Number])
             ->with('status', 'Book issued to '.$student->student_name.' ('.$student->batch_no.').');
