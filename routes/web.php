@@ -74,6 +74,7 @@ Route::middleware('admin')->group(function () {
     Route::get('/students/{student}', [StudentsController::class, 'show'])->name('students.show');
     Route::post('/students/{student}/issue', [StudentsController::class, 'issue'])->name('students.issue');
     Route::post('/students/{student}/issues/{issue}/return', [StudentsController::class, 'returnBook'])->name('students.return');
+    Route::match(['put','patch'],'/students/{student}/issues/{issue}', [StudentsController::class, 'updateIssue'])->name('students.issues.update');
 });
 
 Route::middleware('student')->group(function () {

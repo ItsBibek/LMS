@@ -5,13 +5,13 @@
 @section('header_actions')
  <a href="{{ route('books.create') }}" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700">Add Book</a>
 @endsection
-@section('subheader', 'Search by accession number or part of a title')
+@section('subheader', 'Search by accession number or Title')
 
 @section('content')
  <div class="bg-white border border-slate-200 rounded-xl p-4 md:p-6">
   <form method="GET" action="{{ route('books.index') }}" class="grid grid-cols-1 md:grid-cols-6 gap-3">
    <div class="md:col-span-5">
-    <input type="text" name="q" value="{{ $q }}" placeholder="Accession number or part of title (e.g. 'numerical')"
+    <input type="text" name="q" value="{{ $q }}" placeholder="Accession number or Title"
            autofocus autocomplete="off"
            class="w-full rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
    </div>

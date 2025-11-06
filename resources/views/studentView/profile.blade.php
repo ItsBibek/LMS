@@ -157,6 +157,7 @@
               <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Title</th>
               <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Issue Date</th>
               <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Due Date</th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Fine</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-slate-200">
@@ -166,10 +167,21 @@
                 <td class="px-4 py-2 text-sm">{{ optional($issue->book)->Title ?? '-' }}</td>
                 <td class="px-4 py-2 text-sm">{{ $issue->issue_date }}</td>
                 <td class="px-4 py-2 text-sm">{{ $issue->due_date }}</td>
+                <td class="px-4 py-2 text-sm">
+                  @php($today = \Carbon\Carbon::now())
+                  @php($due = \Carbon\Carbon::parse($issue->due_date))
+                  @php($lateDays = max(0, $due->diffInDays($today, false)))
+                  @php($fineNow = $lateDays * 2)
+                  @if($fineNow > 0)
+                    <span class="text-rose-600 font-semibold">{{ number_format($fineNow, 2) }}</span>
+                  @else
+                    <span class="text-slate-600">{{ number_format($fineNow, 2) }}</span>
+                  @endif
+                </td>
               </tr>
             @empty
               <tr>
-                <td colspan="4" class="px-4 py-4 text-center text-sm text-slate-500">No books currently issued.</td>
+                <td colspan="5" class="px-4 py-4 text-center text-sm text-slate-500">No books currently issued.</td>
               </tr>
             @endforelse
           </tbody>

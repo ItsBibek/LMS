@@ -16,11 +16,18 @@ class StudentsController extends Controller
     public function index(Request $request)
     {
         $batch = trim((string) $request->get('batch', ''));
+        $name = trim((string) $request->get('name', ''));
+        $faculty = trim((string) $request->get('faculty', ''));
+
         // Normalize scans like "AC-078CSIT04" -> "078CSIT04"
         $normalized = $batch !== ''
             ? preg_replace(['/^AC[-\s]*/i','/[^A-Za-z0-9]/'], ['', ''], $batch)
             : '';
+
         $student = null;
+        $results = collect();
+
+        // Priority: batch search
         if ($batch !== '') {
             $student = User::where('batch_no', $normalized)
                 ->orWhere('batch_no', $batch)
@@ -28,10 +35,37 @@ class StudentsController extends Controller
             if ($student) {
                 return redirect()->route('students.show', $student);
             }
+        } elseif ($name !== '') {
+            // Name + optional faculty filter
+            $query = User::query()
+                ->when($faculty !== '', function ($q) use ($faculty) {
+                    $q->where('faculty', $faculty);
+                })
+                ->where('student_name', 'like', "%{$name}%")
+                ->orderBy('student_name');
+
+            $results = $query->get();
+
+            if ($results->count() === 1) {
+                return redirect()->route('students.show', $results->first());
+            }
         }
+
+        // Faculties for dropdown
+        $faculties = User::select('faculty')
+            ->whereNotNull('faculty')
+            ->where('faculty', '<>', '')
+            ->distinct()
+            ->orderBy('faculty')
+            ->pluck('faculty');
+
         return view('students.index', [
             'batch' => $batch,
             'student' => $student,
+            'name' => $name,
+            'faculty' => $faculty,
+            'faculties' => $faculties,
+            'results' => $results,
         ]);
     }
 
@@ -48,7 +82,7 @@ class StudentsController extends Controller
 
     public function issue(Request $request, User $student)
     {
-        $data = $request->validate([
+        $data = $request->validateWithBag('issue', [
             'accession' => ['required','string'],
             'issue_date' => ['nullable','date'],
         ]);
@@ -60,7 +94,7 @@ class StudentsController extends Controller
         // Ensure book exists
         $book = Book::where('Accession_Number', $accession)->first();
         if (!$book) {
-            return back()->withErrors(['accession' => 'Book with this accession number was not found.'])->withInput();
+            return back()->withErrors(['accession' => 'Book with this accession number was not found.'], 'issue')->withInput();
         }
 
         // Ensure not already issued and unreturned
@@ -68,7 +102,7 @@ class StudentsController extends Controller
             ->whereNull('return_date')
             ->first();
         if ($already) {
-            return back()->withErrors(['accession' => 'This book is currently issued and not yet returned.'])->withInput();
+            return back()->withErrors(['accession' => 'This book is currently issued and not yet returned.'], 'issue')->withInput();
         }
 
         Issue::create([
@@ -103,6 +137,44 @@ class StudentsController extends Controller
         }
 
         return redirect()->route('students.show', $student)->with('status', 'Book returned successfully.');
+    }
+
+    public function updateIssue(Request $request, User $student, Issue $issue)
+    {
+        if ($issue->user_batch_no !== $student->batch_no) {
+            abort(404);
+        }
+
+        $data = $request->validate([
+            'accession' => ['required','string'],
+            'issue_date' => ['required','date'],
+            'due_date' => ['required','date','after_or_equal:issue_date'],
+        ]);
+
+        $accession = preg_replace('/\D+/', '', $data['accession']);
+
+        // Ensure book exists
+        $bookExists = Book::where('Accession_Number', $accession)->exists();
+        if (!$bookExists) {
+            return back()->withErrors(['accession' => 'Book with this accession number was not found.'])->withInput();
+        }
+
+        // Ensure not already issued to someone else (unreturned)
+        $already = Issue::where('Accession_Number', $accession)
+            ->whereNull('return_date')
+            ->where('id', '!=', $issue->id)
+            ->first();
+        if ($already) {
+            return back()->withErrors(['accession' => 'This book is currently issued to another member.'])->withInput();
+        }
+
+        $issue->update([
+            'Accession_Number' => $accession,
+            'issue_date' => Carbon::parse($data['issue_date'])->toDateString(),
+            'due_date' => Carbon::parse($data['due_date'])->toDateString(),
+        ]);
+
+        return redirect()->route('students.show', $student)->with('status', 'Issue updated successfully.');
     }
 
     public function manage()
