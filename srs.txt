@@ -78,66 +78,97 @@ The system shall:
 The system shall:
 •	Provide an Administrator login using credentials configured by the institution (initial implementation uses server-configured credentials).
 •	Provide a Student login via email and Batch Number, maintaining session state to access the student portal.
-•	Protect Administrator routes with admin-only middleware and Student routes with student-only middleware.
 
-3.8 Student and Book Search & Scanning Support
-The system shall:
-•	Support searching books by Accession Number (with numeric-only normalization) or by partial Title.
-•	Support searching students by Batch Number (scanned values normalized) or by exact match.
-•	Support barcode scanners for Accession Number and Student ID input via standard keyboard wedge devices.
+6) Business Rules
+- Loan period: 6 months from issue date.
+- Late fine: Rs. 2 per late day, calculated on return only.
+- A book with an open Issue (no return_date) is “Issued” and cannot be issued again.
+- Reservation lifetime: 24 hours. After that, it auto-expires.
+- If a valid pending reservation exists, only that student can issue during the window.
+- Prevent deleting a book that is currently issued.
 
-4. External Interface Requirements
-4.1 User Interfaces
-The system shall feature a clean, intuitive, and responsive user interface that works effectively on desktop computers, tablets, and mobile phones. The Administrator interface will be dashboard-driven allowing to perform major CRUD operations, while the student portal will be simplified and focused on self-service tasks.
-4.2 Hardware Interfaces
-The system must support interaction with standard USB barcode scanners for efficient data entry.
-4.3 Software Interfaces
-The system shall integrate with the existing college portal to allow for student authentication using their existing credentials.
-4.4 Communications Interfaces
-The system shall be configured to send email notifications via an SMTP server for functionalities such as reminder alerts.
+7) Permissions & Security
+- Admin routes protected by admin middleware.
+- Student routes protected by student middleware.
+- CSRF protection for all forms.
 
-5. Non-Functional Requirements
-5.1 Performance
-•	Search operations for books and students should complete within 2 seconds for up to 10,000 records.
-•	Dashboard metrics should load within 2 seconds under normal load.
-5.2 Security
-•	All form inputs shall be validated server-side. CSRF protection shall be enabled for web routes.
-•	Administrator and Student sessions shall be isolated and protected; privileged routes are guarded by middleware.
-5.3 Reliability & Availability
-•	System shall be available during library operating hours with daily database backups recommended.
-5.4 Maintainability
-•	The codebase follows Laravel MVC structure with Controllers, Models, Migrations, Middleware, and Blade templates.
-5.5 Usability
-•	Interfaces shall be optimized for keyboard input and barcode scanning.
+8) Data Model (Current Database)
+- Book
+  • Accession_Number (PK, string)
+  • Title (string)
+  • Author (string, nullable)
 
-6. Data Model Overview
-6.1 Entities
-•	Book (Accession_Number [PK, string], Title, Author)
-•	User (batch_no [PK, string], student_name, faculty, email, photo_path)
-•	Issue (id [PK], user_batch_no [FK→User.batch_no], Accession_Number [FK→Book.Accession_Number], issue_date, due_date, return_date, fine)
-•	Reservation (id [PK], user_batch_no [FK→User.batch_no], Accession_Number [FK→Book.Accession_Number], reserved_at [datetime], status [pending|issued|declined|expired])
-6.2 Relationships
-•	User 1–N Issue
-•	Book 1–N Issue
-•	User 1–N Reservation
-•	Book 1–N Reservation
+- User (Student)
+  • batch_no (PK, string)
+  • student_name (string)
+  • faculty (string, nullable)
+  • email (string, unique)
+  • photo_path (string, nullable)
 
-7. System Architecture
-•	Framework: Laravel 9 (PHP 8.0+), Blade views, Eloquent ORM, Carbon for date calculations.
-•	Web routes protected by custom middleware: `admin` and `student`.
-•	Storage: Public disk used for student photo uploads.
-•	Views: Separate layouts for admin and student portals; CRUD views for books and students; reservation and dashboard views.
+- Issue
+  • id (PK, bigint)
+  • user_batch_no (FK → users.batch_no)
+  • Accession_Number (FK → books.Accession_Number)
+  • issue_date (date)
+  • due_date (date)
+  • return_date (date, nullable)
+  • fine (decimal, defaults 0)
 
-8. Dependencies and Packages
-•	laravel/framework ^9.19
-•	php ^8.0.2
-•	doctrine/dbal ^3.10 (schema changes)
-•	laravel/sanctum ^3.0 (available, not currently used by implemented features)
-•	laravel/tinker ^2.7
+- Reservation
+  • id (PK, bigint)
+  • user_batch_no (FK → users.batch_no)
+  • Accession_Number (FK → books.Accession_Number)
+  • reserved_at (timestamp, default now)
+  • status (string: pending | issued | declined | expired)
 
-9. Implementation Notes
-•	Loan period defaults to 6 months; fines accrue at Rs. 2/day after due date and are computed on return.
-•	Accession Number normalization (numeric-only) is applied for scans; student Batch Number normalization is supported.
-•	Admin credentials are server-configured; consider integrating with institutional SSO in future.
+9) ER Diagram (ASCII)
 
+  +-------------------+             +-----------------+
+  |       User        |             |      Book       |
+  |-------------------|             |-----------------|
+  | batch_no (PK)     |             | Accession_No(PK)|
+  | student_name      |             | Title           |
+  | faculty (nullable)|             | Author (null)   |
+  | email (unique)    |             +-----------------+
+  | photo_path (null) |
+  +---------+---------+
+            | 1..*                        1..*
+            |                                 \
+            |                                  \
+  +---------v----------+               +--------v---------+
+  |       Issue        |               |   Reservation    |
+  |--------------------|               |------------------|
+  | id (PK)            |               | id (PK)          |
+  | user_batch_no (FK) |<--------------+ user_batch_no(FK)|
+  | Accession_No (FK)  |----->--------> Accession_No (FK) |
+  | issue_date         |               | reserved_at      |
+  | due_date           |               | status           |
+  | return_date (null) |
+  | fine (decimal)     |
+  +--------------------+
 
+10) Non-Functional Requirements
+- Performance: searches and dashboard counters should return within ~2 seconds on typical data sizes (~10K rows).
+- Reliability: daily DB backups recommended; app should be available during library hours.
+- Maintainability: Laravel MVC, migrations, Eloquent; code arranged by controllers/models/views.
+- Usability: keyboard- and scanner-friendly forms; clear error and success messages.
+
+11) Out of Scope (for now)
+- Email/SMS reminders, online payments, fine settlement workflows.
+- Multi-copy inventory per title (current model treats each Accession Number as a unique copy; no title-level aggregation).
+- Full RBAC beyond Admin/Student roles.
+
+12) Future Enhancements
+- Overdue reminders by email.
+- CSV import/export for books and students.
+- Per-title catalog with multiple copies mapped to a Title record.
+- Fine payment tracking and receipts.
+- SSO integration for Admin users.
+
+13) Traceability (features → data)
+- Issue/Return uses: Issue.user_batch_no, Issue.Accession_Number, dates, fine.
+- Book availability computed from Issue where return_date IS NULL.
+- Reservations use: Reservation.status and reserved_at to control issuing access.
+- Student profile uses: User (batch_no, name, faculty, email, photo_path) and Issues for history.
+
+End of document.

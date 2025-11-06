@@ -98,6 +98,37 @@
 
    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
     <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+     <h3 class="text-sm font-semibold text-slate-700">Active Reservations</h3>
+    </div>
+    <div class="overflow-x-auto">
+     <table class="min-w-full divide-y divide-slate-200">
+      <thead class="bg-slate-50">
+       <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Accession No.</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Title</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Expires</th>
+       </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-slate-200">
+       @forelse(($activeReservations ?? collect()) as $r)
+        @php($expires = \Carbon\Carbon::parse($r->reserved_at)->addHours(24))
+        <tr>
+         <td class="px-6 py-3 text-sm">{{ $r->Accession_Number }}</td>
+         <td class="px-6 py-3 text-sm">{{ optional($r->book)->Title ?? '-' }}</td>
+         <td class="px-6 py-3 text-sm">{{ $expires->toDayDateTimeString() }}</td>
+        </tr>
+       @empty
+        <tr>
+         <td colspan="3" class="px-6 py-6 text-center text-sm text-slate-500">No active reservations.</td>
+        </tr>
+       @endforelse
+      </tbody>
+     </table>
+    </div>
+   </div>
+
+   <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
      <h3 class="text-sm font-semibold text-slate-700">History</h3>
     </div>
     <div class="overflow-x-auto">

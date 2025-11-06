@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Book;
 use App\Models\Issue;
+use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
@@ -41,8 +42,20 @@ class StudentsController extends Controller
             'currentIssues.book',
             'returnedIssues.book',
         ]);
+        // Active, non-expired reservations for this student
+        $activeReservations = Reservation::with('book')
+            ->where('user_batch_no', $student->batch_no)
+            ->where('status', 'pending')
+            ->orderByDesc('reserved_at')
+            ->get()
+            ->filter(function ($r) {
+                return \Carbon\Carbon::parse($r->reserved_at)->addHours(24)->isFuture();
+            })
+            ->values();
+
         return view('students.show', [
             'student' => $student,
+            'activeReservations' => $activeReservations,
         ]);
     }
 
@@ -112,7 +125,8 @@ class StudentsController extends Controller
                 $q->where('faculty', $activeFaculty);
             })
             ->orderBy('student_name')
-            ->get();
+            ->paginate(10)
+            ->withQueryString();
 
         $faculties = User::select('faculty')
             ->distinct()
@@ -124,12 +138,20 @@ class StudentsController extends Controller
             ->groupBy('faculty')
             ->pluck('total', 'faculty');
 
+        // Active reservation counts per student (pending and not expired)
+        $activeReservationCounts = Reservation::where('status', 'pending')
+            ->where('reserved_at', '>=', \Carbon\Carbon::now()->subHours(24))
+            ->select('user_batch_no', DB::raw('COUNT(*) as total'))
+            ->groupBy('user_batch_no')
+            ->pluck('total', 'user_batch_no');
+
         return view('students.manage', [
             'students' => $students,
             'faculties' => $faculties,
             'activeFaculty' => $activeFaculty,
             'counts' => $counts,
             'totalCount' => User::count(),
+            'activeReservationCounts' => $activeReservationCounts,
         ]);
     }
 

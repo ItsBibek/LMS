@@ -33,14 +33,18 @@
         <form method="POST" action="{{ route('admin.login') }}">
           @csrf
           <div class="mt-4">
-            <label>Username</label>
-            <input type="text" name="username" value="{{ old('username') }}" required />
+            <label>Email</label>
+            <input type="email" name="email" value="{{ old('email', env('ADMIN_EMAIL', 'anusha078@academiacollege.edu.np')) }}" required />
           </div>
           <div class="mt-4">
             <label>Password</label>
-            <input type="password" name="password" required />
+            <input type="password" name="password" value="{{ old('password', env('ADMIN_PASSWORD', 'demo123@')) }}" required />
           </div>
           <button type="submit" class="btn mt-6">Login</button>
+        </form>
+        <form method="POST" action="{{ route('admin.forgot') }}">
+          @csrf
+          <button type="submit" class="link" style="background:none;border:0;padding:0;">Forgot password?</button>
         </form>
         <a class="link" href="{{ route('student.login.form') }}">STUDENT LOGIN</a>
       </div>

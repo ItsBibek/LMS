@@ -26,6 +26,7 @@ Route::get('/login', function() { return redirect('/'); });
 // Admin login page
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login.form');
 Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login');
+Route::post('/admin/forgot', [AdminAuthController::class, 'sendResetCode'])->name('admin.forgot');
 
 // Keep /student/login as redirect to root student page
 Route::get('/student/login', function() { return redirect('/'); });

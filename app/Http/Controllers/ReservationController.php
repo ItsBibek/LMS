@@ -48,12 +48,15 @@ class ReservationController extends Controller
         }
 
         // If another active pending reservation exists, block
-        $existing = Reservation::where('Accession_Number', $book->Accession_Number)
+        $existing = Reservation::with('user')
+            ->where('Accession_Number', $book->Accession_Number)
             ->where('status', 'pending')
             ->first();
         if ($existing && $existing->user_batch_no !== $batch) {
             $expiresAt = Carbon::parse($existing->reserved_at)->addHours(24)->toDayDateTimeString();
-            return back()->withErrors(['accession' => 'This book is reserved by '.$existing->user_batch_no.' until '.$expiresAt.'.']);
+            $name = optional($existing->user)->student_name;
+            $label = $name ? ($name.' ('.$existing->user_batch_no.')') : $existing->user_batch_no;
+            return back()->withErrors(['accession' => 'This book is reserved by '.$label.' until '.$expiresAt.'.']);
         }
 
         // If same student has an active reservation, refresh timestamp
@@ -88,7 +91,7 @@ class ReservationController extends Controller
         $reservations = Reservation::with(['user','book'])
             ->orderByRaw("CASE status WHEN 'pending' THEN 0 WHEN 'issued' THEN 1 WHEN 'declined' THEN 2 ELSE 3 END")
             ->orderByDesc('reserved_at')
-            ->paginate(20);
+            ->paginate(10);
 
         return view('reservations.index', compact('reservations'));
     }

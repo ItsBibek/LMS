@@ -32,7 +32,38 @@
 
   <div class="mt-6">
    @if($q === '')
-    <div class="text-center text-slate-500 text-sm py-8">Type an accession number or any part of a book title and press Search.</div>
+    <div class="text-center text-slate-500 text-sm py-4">Type an accession number or any part of a book title and press Search.</div>
+    @if(isset($allBooks) && $allBooks)
+     <div class="mt-2 overflow-x-auto bg-white border border-slate-200 rounded-xl">
+      <table class="min-w-full divide-y divide-slate-200">
+       <thead class="bg-slate-50">
+        <tr>
+         <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Title</th>
+         <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Accession</th>
+         <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Author</th>
+         <th class="px-4 py-3"></th>
+        </tr>
+       </thead>
+       <tbody class="bg-white divide-y divide-slate-200">
+        @forelse($allBooks as $b)
+         <tr>
+          <td class="px-4 py-3 text-sm">{{ $b->Title ?? '-' }}</td>
+          <td class="px-4 py-3 text-sm">{{ $b->Accession_Number }}</td>
+          <td class="px-4 py-3 text-sm">{{ $b->Author ?? '-' }}</td>
+          <td class="px-4 py-3 text-right">
+           <a href="{{ route('books.index', ['q' => $b->Accession_Number]) }}" class="inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium hover:bg-slate-50">View</a>
+          </td>
+         </tr>
+        @empty
+         <tr>
+          <td colspan="4" class="px-4 py-6 text-center text-sm text-slate-500">No books found.</td>
+         </tr>
+        @endforelse
+       </tbody>
+      </table>
+      <div class="px-4 py-3 border-t border-slate-200">{{ $allBooks->links() }}</div>
+     </div>
+    @endif
    @endif
 
    @if(isset($matches) && $matches && $matches->count() > 0)
@@ -66,7 +97,7 @@
        <span class="inline-flex items-center rounded-md bg-rose-50 text-rose-700 px-2 py-1 text-xs font-medium">Issued</span>
       @elseif(isset($activeReservation) && $activeReservation)
        @php($expires = \Carbon\Carbon::parse($activeReservation->reserved_at)->addHours(24))
-       <span class="inline-flex items-center rounded-md bg-amber-50 text-amber-700 px-2 py-1 text-xs font-medium">Reserved by {{ $activeReservation->user_batch_no }} until {{ $expires->toDayDateTimeString() }}</span>
+       <span class="inline-flex items-center rounded-md bg-amber-50 text-amber-700 px-2 py-1 text-xs font-medium">Reserved by {{ optional($activeReservation->user)->student_name ?? 'Unknown' }} ({{ $activeReservation->user_batch_no }}) until {{ $expires->toDayDateTimeString() }}</span>
       @else
        <span class="inline-flex items-center rounded-md bg-emerald-50 text-emerald-700 px-2 py-1 text-xs font-medium">Available</span>
       @endif
@@ -146,11 +177,11 @@
        @if(isset($activeReservation) && $activeReservation)
         @php($expires = \Carbon\Carbon::parse($activeReservation->reserved_at)->addHours(24))
         <div class="mt-3 flex flex-col md:flex-row md:items-end md:justify-between gap-3">
-         <div class="text-sm text-amber-700">Reserved by <strong>{{ $activeReservation->user_batch_no }}</strong> until {{ $expires->toDayDateTimeString() }}.</div>
+         <div class="text-sm text-amber-700">Reserved by <strong>{{ optional($activeReservation->user)->student_name ?? 'Unknown' }} ({{ $activeReservation->user_batch_no }})</strong> until {{ $expires->toDayDateTimeString() }}.</div>
          <div class="flex gap-2">
           <form method="POST" action="{{ route('reservations.issue', $activeReservation) }}">
            @csrf
-           <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700">Issue to {{ $activeReservation->user_batch_no }}</button>
+           <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700">Issue to {{ optional($activeReservation->user)->student_name ?? 'Student' }} ({{ $activeReservation->user_batch_no }})</button>
           </form>
           <form method="POST" action="{{ route('reservations.destroy', $activeReservation) }}" onsubmit="return confirm('Delete this reservation?')">
            @csrf

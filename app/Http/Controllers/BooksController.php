@@ -37,6 +37,7 @@ class BooksController extends Controller
 
         $book = null;
         $matches = collect();
+        $allBooks = null;
         $isIssued = false;
         $currentIssue = null;
         $lateDays = 0;
@@ -90,7 +91,8 @@ class BooksController extends Controller
                     }
                 }
                 // After expiring old ones, pick the first active pending reservation (if any)
-                $activeReservation = Reservation::where('Accession_Number', $book->Accession_Number)
+                $activeReservation = Reservation::with('user')
+                    ->where('Accession_Number', $book->Accession_Number)
                     ->where('status', 'pending')
                     ->orderBy('reserved_at')
                     ->first();
@@ -106,6 +108,7 @@ class BooksController extends Controller
             'lateDays' => $lateDays,
             'accruedFine' => $accruedFine,
             'activeReservation' => isset($activeReservation) ? $activeReservation : null,
+            'allBooks' => $allBooks,
         ]);
     }
 
@@ -138,7 +141,8 @@ class BooksController extends Controller
         }
 
         // Respect reservations: if there is a pending, unexpired reservation, only that student can issue
-        $activeReservation = Reservation::where('Accession_Number', $book->Accession_Number)
+        $activeReservation = Reservation::with('user')
+            ->where('Accession_Number', $book->Accession_Number)
             ->where('status', 'pending')
             ->orderBy('reserved_at')
             ->first();
@@ -149,7 +153,9 @@ class BooksController extends Controller
                 $activeReservation->save();
             } else if ($activeReservation->user_batch_no !== $student->batch_no) {
                 $expiresAt = Carbon::parse($activeReservation->reserved_at)->addHours(24);
-                return back()->withErrors(['accession' => 'This book is reserved by '.$activeReservation->user_batch_no.' until '.$expiresAt->toDayDateTimeString().'.'])->withInput();
+                $name = optional($activeReservation->user)->student_name;
+                $label = $name ? ($name.' ('.$activeReservation->user_batch_no.')') : $activeReservation->user_batch_no;
+                return back()->withErrors(['accession' => 'This book is reserved by '.$label.' until '.$expiresAt->toDayDateTimeString().'.'])->withInput();
             }
         }
 
