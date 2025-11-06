@@ -19,7 +19,7 @@
     .mt-4{margin-top:16px}.mt-6{margin-top:24px}.mb-2{margin-bottom:8px}.mb-4{margin-bottom:16px}
     .error{color:#dc2626;font-size:13px}
     .title{font-weight:700;font-size:18px;color:var(--slate);margin-bottom:8px;text-align:center}
-    .link{display:inline-block;margin-top:16px;font-weight:600;color:var(--indigo);text-decoration:none;text-align:center;width:100%}
+    .link{display:inline-block;margin-top:16px;font-weight:600;color:var(--indigo);text-decoration:underline;text-align:center;width:100%;font-size:12px}
   </style>
 </head>
 <body>

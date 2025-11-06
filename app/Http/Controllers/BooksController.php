@@ -36,32 +36,35 @@ class BooksController extends Controller
         $normalized = $q !== '' ? preg_replace('/\D+/', '', $q) : '';
 
         $book = null;
-        $matches = collect();
+        $matches = null;
         $isIssued = false;
         $currentIssue = null;
         $lateDays = 0;
         $accruedFine = 0;
+        $totalMatches = null;
 
         if ($q !== '') {
-            // 1) Try accession number first (supports numeric-only or raw)
+            // 1) Try accession number exact first (supports numeric-only or raw)
             $book = Book::query()
                 ->where('Accession_Number', $normalized)
                 ->orWhere('Accession_Number', $q)
                 ->first();
 
-            // 2) If not found by accession, try partial Title match (case-insensitive)
+            // 2) If not found by accession, list matches using PREFIX search
             if (!$book) {
-                $matches = Book::query()
-                    ->where('Title', 'LIKE', '%'.$q.'%')
-                    ->orderBy('Title')
-                    ->limit(50)
-                    ->get();
-
-                // If exactly one match, show details directly
-                if ($matches->count() === 1) {
-                    $book = $matches->first();
-                    $matches = collect();
+                $query = Book::query();
+                if ($normalized !== '' && ctype_digit($normalized)) {
+                    // Accession number prefix search (no cap)
+                    $query->where('Accession_Number', 'LIKE', $normalized.'%');
+                } else {
+                    // Case-insensitive title CONTAINS search (middle matches allowed)
+                    $query->whereRaw('LOWER(Title) LIKE ?', ['%'.strtolower($q).'%']);
                 }
+                $totalMatches = (clone $query)->count();
+                $matches = $query
+                    ->orderBy('Title')
+                    ->simplePaginate(15)
+                    ->appends(['q' => $q]);
             }
 
             if ($book) {
@@ -106,6 +109,7 @@ class BooksController extends Controller
             'lateDays' => $lateDays,
             'accruedFine' => $accruedFine,
             'activeReservation' => isset($activeReservation) ? $activeReservation : null,
+            'total_matches' => $totalMatches,
         ]);
     }
 

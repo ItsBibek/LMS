@@ -37,8 +37,11 @@
 
    @if(isset($matches) && $matches && $matches->count() > 0)
     <div class="bg-white border border-slate-200 rounded-xl">
-     <div class="px-4 py-3 border-b border-slate-200">
-      <h3 class="text-sm font-semibold text-slate-700">Found {{ $matches->count() }} matching title{{ $matches->count() === 1 ? '' : 's' }}</h3>
+     <div class="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+      <h3 class="text-sm font-semibold text-slate-700">Found {{ method_exists($matches, 'total') ? $matches->total() : $matches->count() }} matching title{{ (method_exists($matches, 'total') ? $matches->total() : $matches->count()) === 1 ? '' : 's' }}</h3>
+      @if(method_exists($matches, 'total'))
+       <div class="text-xs text-slate-500">Page {{ $matches->currentPage() }} of {{ $matches->lastPage() }}</div>
+      @endif
      </div>
      <ul class="divide-y divide-slate-200">
       @foreach($matches as $m)
@@ -51,6 +54,12 @@
        </li>
       @endforeach
      </ul>
+     @if(method_exists($matches, 'links'))
+      <div class="px-4 md:px-6 py-3 border-t border-slate-200 flex items-center justify-between">
+       <div class="text-sm text-slate-600">{{ ($total_matches ?? null) ? number_format($total_matches) : (method_exists($matches, 'total') ? number_format($matches->total()) : $matches->count()) }} results found</div>
+       {{ $matches->links() }}
+      </div>
+     @endif
     </div>
    @endif
 
@@ -180,7 +189,7 @@
      @endif
     </div>
    @else
-    @if($q !== '' && (!isset($matches) || $matches->count() === 0))
+    @if($q !== '' && (!isset($matches) || ($matches && $matches->count() === 0)))
      <div class="text-center text-slate-500 text-sm py-8">No books found for "{{ $q }}".</div>
     @endif
    @endif

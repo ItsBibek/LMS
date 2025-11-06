@@ -26,10 +26,10 @@
     <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700 w-full">Sign in</button>
    </div>
   </form>
-  <div class="mt-4 text-center text-sm">
-   <a href="{{ route('student.register.show') }}" class="text-indigo-600 font-medium">Create a new account</a>
+  <div class="mt-4 text-center text-xs">
+   <a href="{{ route('student.register.show') }}" class="text-indigo-600 underline">Create a new account</a>
    <span class="mx-2">·</span>
-   <a href="{{ route('password.request') }}" class="text-indigo-600 font-medium">Forgot password?</a>
+   <a href="{{ route('password.request') }}" class="text-indigo-600 underline">Forgot password?</a>
   </div>
  </div>
 @endsection
