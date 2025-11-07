@@ -15,6 +15,11 @@ class Authenticate extends Middleware
     protected function redirectTo($request)
     {
         if (! $request->expectsJson()) {
+            // Check if this is an admin route (starts with /admin, /dashboard, /books, /students, /reservations)
+            if ($request->is('admin/*') || $request->is('dashboard') || $request->is('books*') || $request->is('students*') || $request->is('reservations*')) {
+                return route('admin.login.form');
+            }
+            // Student routes - redirect to student login (root)
             return route('login');
         }
     }

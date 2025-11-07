@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\BooksController;
 use App\Http\Controllers\StudentsController;
 use App\Http\Controllers\AdminAuthController;
-use App\Http\Controllers\StudentAuthController;
 use App\Http\Controllers\StudentProfileController;
 use App\Http\Controllers\ReservationController;
 use App\Models\Book;
@@ -12,28 +12,33 @@ use App\Models\User;
 use App\Models\Issue;
 use Carbon\Carbon;
 
+// Admin password reset (forgot/reset) routes
+Route::middleware('guest:admin')->group(function () {
+    Route::get('/admin/forgot-password', [\App\Http\Controllers\Admin\Auth\PasswordResetLinkController::class, 'create'])->name('admin.password.request');
+    Route::post('/admin/forgot-password', [\App\Http\Controllers\Admin\Auth\PasswordResetLinkController::class, 'store'])->name('admin.password.email');
+    Route::get('/admin/reset-password/{token}', [\App\Http\Controllers\Admin\Auth\NewPasswordController::class, 'create'])->name('admin.password.reset');
+    Route::post('/admin/reset-password', [\App\Http\Controllers\Admin\Auth\NewPasswordController::class, 'store'])->name('admin.password.store');
+});
+
 Route::get('/', function() {
-    if (session('is_admin')) {
+    // Redirect authenticated users to their respective dashboards
+    if (Auth::guard('admin')->check()) {
         return redirect()->route('dashboard');
     }
-    if (session()->has('student_batch')) {
+    if (Auth::guard('web')->check()) {
         return redirect()->route('student.profile');
     }
     return view('auth.student');
 })->name('student.login.form');
-Route::get('/login', function() { return redirect('/'); });
 
-// Admin login page
-Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login.form');
-Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login');
+// Admin login routes
+Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login.form')->middleware('guest:admin');
+Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login')->middleware('guest:admin');
 
-// Keep /student/login as redirect to root student page
+// Keep /student/login as redirect to root student page; Breeze handles POST /login via auth.php
 Route::get('/student/login', function() { return redirect('/'); });
-Route::post('/student/login', [StudentAuthController::class, 'login'])->name('student.login');
-Route::post('/student/logout', [StudentAuthController::class, 'logout'])->name('student.logout');
 
-
-Route::middleware('admin')->group(function () {
+Route::middleware('auth:admin')->group(function () {
     Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
     Route::get('/dashboard', function () {
@@ -77,19 +82,15 @@ Route::middleware('admin')->group(function () {
     Route::match(['put','patch'],'/students/{student}/issues/{issue}', [StudentsController::class, 'updateIssue'])->name('students.issues.update');
 });
 
-Route::middleware('student')->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('/student/profile', [StudentProfileController::class, 'profile'])->name('student.profile');
     Route::post('/student/reservations', [ReservationController::class, 'store'])->name('student.reservations.store');
     Route::delete('/student/reservations/{reservation}', [ReservationController::class, 'cancel'])->name('student.reservations.cancel');
 });
 
-// Fallback: block direct URL access and route users to the right home
+require __DIR__.'/auth.php';
+
+// Fallback: route users to the login page by default
 Route::fallback(function () {
-    if (session('is_admin')) {
-        return redirect()->route('dashboard');
-    }
-    if (session()->has('student_batch')) {
-        return redirect()->route('student.profile');
-    }
-    return redirect()->route('student.login.form');
+    return redirect()->route('login');
 });

@@ -33,18 +33,19 @@
         @if ($errors->any())
           <div class="mb-4 error">{{ $errors->first() }}</div>
         @endif
-        <form method="POST" action="{{ route('student.login') }}">
+        <form method="POST" action="{{ route('login') }}">
           @csrf
           <div class="mt-4">
             <label>Email</label>
             <input type="email" name="email" value="{{ old('email') }}" required />
           </div>
           <div class="mt-4">
-            <label>Batch Number</label>
-            <input type="text" name="batch_no" value="{{ old('batch_no') }}" required />
+            <label>Password</label>
+            <input type="password" name="password" required />
           </div>
           <button type="submit" class="btn mt-6">Login</button>
         </form>
+        <a class="link" href="{{ route('password.request') }}">Forgot password?</a>
         <a class="link" href="{{ route('admin.login.form') }}">ADMIN LOGIN</a>
       </div>
     </div>

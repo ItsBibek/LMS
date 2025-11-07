@@ -14,8 +14,9 @@ class StudentProfileController extends Controller
 {
     public function profile(Request $request)
     {
-        $batch = $request->session()->get('student_batch');
-        $student = User::with(['issues.book'])->findOrFail($batch);
+        $student = $request->user();
+        $batch = $student->batch_no;
+        $student->load(['issues.book']);
 
         $q = trim((string) $request->get('q', ''));
         $matches = collect();

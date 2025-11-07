@@ -14,8 +14,9 @@ class ReservationController extends Controller
     // Student creates a reservation
     public function store(Request $request)
     {
-        $batch = $request->session()->get('student_batch');
-        abort_unless($batch, 403);
+        $user = $request->user();
+        abort_unless($user, 403);
+        $batch = $user->batch_no;
 
         $data = $request->validate([
             'accession' => ['required','string'],
@@ -148,8 +149,9 @@ class ReservationController extends Controller
     // Student: cancel own reservation -> mark declined
     public function cancel(Request $request, Reservation $reservation)
     {
-        $batch = $request->session()->get('student_batch');
-        abort_unless($batch, 403);
+        $user = $request->user();
+        abort_unless($user, 403);
+        $batch = $user->batch_no;
         if ($reservation->user_batch_no !== $batch) {
             abort(403);
         }

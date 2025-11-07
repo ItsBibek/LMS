@@ -57,6 +57,75 @@
   </div>
 
   <div class="lg:col-span-2 space-y-6">
+  <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+   <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+    <h3 class="text-sm font-semibold text-slate-700">Reserved</h3>
+   </div>
+   @php($activeReservations = $student->reservations()->where('status','pending')->latest('reserved_at')->paginate(10))
+   <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-slate-200">
+     <thead class="bg-slate-50">
+      <tr>
+       <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Accession No.</th>
+       <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Title</th>
+       <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Reserved</th>
+       <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Expires</th>
+       <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
+       <th class="px-6 py-3"></th>
+      </tr>
+     </thead>
+     <tbody class="bg-white divide-y divide-slate-200">
+      @forelse($activeReservations as $r)
+       @php($expires = \Carbon\Carbon::parse($r->reserved_at)->addHours(24))
+       <tr>
+        <td class="px-6 py-3 text-sm">{{ $r->Accession_Number }}</td>
+        <td class="px-6 py-3 text-sm">{{ optional($r->book)->Title ?? '-' }}</td>
+        <td class="px-6 py-3 text-sm">{{ \Carbon\Carbon::parse($r->reserved_at)->toDayDateTimeString() }}</td>
+        <td class="px-6 py-3 text-sm">{{ $expires->toDayDateTimeString() }}</td>
+        <td class="px-6 py-3 text-sm">
+         @if($r->is_expired)
+          <span class="inline-flex items-center rounded-md bg-rose-50 text-rose-700 px-2 py-1 text-xs font-medium">Expired</span>
+         @else
+          <span class="inline-flex items-center rounded-md bg-amber-50 text-amber-700 px-2 py-1 text-xs font-medium">Pending</span>
+         @endif
+        </td>
+        <td class="px-6 py-3 text-right">
+         @if(!$r->is_expired)
+          <div class="inline-flex items-center gap-2">
+           <form method="POST" action="{{ route('reservations.issue', $r) }}" class="inline">
+            @csrf
+            <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-white text-sm font-medium hover:bg-indigo-700">Issue</button>
+           </form>
+           <form method="POST" action="{{ route('reservations.destroy', $r) }}" class="inline" onsubmit="return confirm('Decline this reservation?')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-50">Decline</button>
+           </form>
+          </div>
+         @else
+          <form method="POST" action="{{ route('reservations.destroy', $r) }}" class="inline" onsubmit="return confirm('Delete this expired reservation?')">
+           @csrf
+           @method('DELETE')
+           <button type="submit" class="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-50">Delete</button>
+          </form>
+         @endif
+        </td>
+       </tr>
+      @empty
+       <tr>
+        <td colspan="6" class="px-6 py-6 text-center text-sm text-slate-500">No active reservations.</td>
+       </tr>
+      @endforelse
+     </tbody>
+    </table>
+   </div>
+   @if(method_exists($activeReservations, 'links'))
+    <div class="px-6 py-3 border-t border-slate-200 flex items-center justify-between">
+     <div class="text-sm text-slate-600">{{ number_format($activeReservations->total()) }} results</div>
+     {{ $activeReservations->links() }}
+    </div>
+   @endif
+  </div>
    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
     <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
      <h3 class="text-sm font-semibold text-slate-700">Currently Issued</h3>

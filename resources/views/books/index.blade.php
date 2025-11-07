@@ -75,7 +75,7 @@
        <span class="inline-flex items-center rounded-md bg-rose-50 text-rose-700 px-2 py-1 text-xs font-medium">Issued</span>
       @elseif(isset($activeReservation) && $activeReservation)
        @php($expires = \Carbon\Carbon::parse($activeReservation->reserved_at)->addHours(24))
-       <span class="inline-flex items-center rounded-md bg-amber-50 text-amber-700 px-2 py-1 text-xs font-medium">Reserved by {{ $activeReservation->user_batch_no }} until {{ $expires->toDayDateTimeString() }}</span>
+       <span class="inline-flex items-center rounded-md bg-amber-50 text-amber-700 px-2 py-1 text-xs font-medium">Reserved by {{ optional($activeReservation->user)->student_name ?? $activeReservation->user_batch_no }} until {{ $expires->toDayDateTimeString() }}</span>
       @else
        <span class="inline-flex items-center rounded-md bg-emerald-50 text-emerald-700 px-2 py-1 text-xs font-medium">Available</span>
       @endif
@@ -155,7 +155,7 @@
        @if(isset($activeReservation) && $activeReservation)
         @php($expires = \Carbon\Carbon::parse($activeReservation->reserved_at)->addHours(24))
         <div class="mt-3 flex flex-col md:flex-row md:items-end md:justify-between gap-3">
-         <div class="text-sm text-amber-700">Reserved by <strong>{{ $activeReservation->user_batch_no }}</strong> until {{ $expires->toDayDateTimeString() }}.</div>
+         <div class="text-sm text-amber-700">Reserved by <strong>{{ optional($activeReservation->user)->student_name ?? $activeReservation->user_batch_no }}</strong> until {{ $expires->toDayDateTimeString() }}.</div>
          <div class="flex gap-2">
           <form method="POST" action="{{ route('reservations.issue', $activeReservation) }}">
            @csrf

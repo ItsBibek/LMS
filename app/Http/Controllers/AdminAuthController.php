@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AdminAuthController extends Controller
 {
@@ -13,25 +14,22 @@ class AdminAuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'username' => ['required','string'],
+        $credentials = $request->validate([
+            'email' => ['required','email'],
             'password' => ['required','string'],
         ]);
 
-        $username = $request->input('username');
-        $password = $request->input('password');
-
-        if ($username === 'academialibrary' && $password === 'AIClms69') {
-            $request->session()->put('is_admin', true);
+        if (Auth::guard('admin')->attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
             return redirect()->route('dashboard');
         }
 
-        return back()->withErrors(['username' => 'Invalid credentials'])->withInput();
+        return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
     }
 
     public function logout(Request $request)
     {
-        $request->session()->forget('is_admin');
+        Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect()->route('admin.login.form');

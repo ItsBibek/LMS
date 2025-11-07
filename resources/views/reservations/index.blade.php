@@ -78,8 +78,11 @@
     </tbody>
    </table>
   </div>
-  <div class="px-6 py-4 border-t border-slate-200">
-   {{ $reservations->links() }}
-  </div>
+  @if(method_exists($reservations, 'links'))
+   <div class="px-6 py-3 border-t border-slate-200 flex items-center justify-between">
+    <div class="text-sm text-slate-600">{{ number_format($reservations->total()) }} results</div>
+    {{ $reservations->links() }}
+   </div>
+  @endif
  </div>
 @endsection

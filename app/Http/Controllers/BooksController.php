@@ -93,7 +93,8 @@ class BooksController extends Controller
                     }
                 }
                 // After expiring old ones, pick the first active pending reservation (if any)
-                $activeReservation = Reservation::where('Accession_Number', $book->Accession_Number)
+                $activeReservation = Reservation::with('user')
+                    ->where('Accession_Number', $book->Accession_Number)
                     ->where('status', 'pending')
                     ->orderBy('reserved_at')
                     ->first();

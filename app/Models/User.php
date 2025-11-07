@@ -28,6 +28,7 @@ class User extends Authenticatable
         'email',
         'photo_path',
         'password',
+        'is_admin',
     ];
 
     /**
@@ -47,6 +48,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_admin' => 'boolean',
     ];
 
     public function getRouteKeyName()
@@ -67,5 +69,10 @@ class User extends Authenticatable
     public function returnedIssues()
     {
         return $this->issues()->whereNotNull('return_date');
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class, 'user_batch_no', 'batch_no');
     }
 }

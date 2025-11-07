@@ -19,12 +19,12 @@
        <h1 class="text-xl font-semibold">@yield('header', 'Profile')</h1>
        <p class="text-sm text-slate-500">@yield('subheader')</p>
       </div>
-      @if(session()->has('student_batch'))
-       <form method="POST" action="{{ route('student.logout') }}">
+      @auth
+       <form method="POST" action="{{ route('logout') }}">
         @csrf
         <button type="submit" class="inline-flex items-center justify-center rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-50">Logout</button>
        </form>
-      @endif
+      @endauth
      </div>
     </header>
     @yield('content')

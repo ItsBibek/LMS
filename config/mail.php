@@ -92,7 +92,7 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', '01biveka@gmail.com'),
+        'address' => env('MAIL_FROM_ADDRESS', 'anushashrestha813@gmail.com'),
         'name' => env('MAIL_FROM_NAME', 'Academia Library'),
     ],
 
