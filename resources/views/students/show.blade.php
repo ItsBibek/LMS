@@ -5,11 +5,11 @@
 @section('subheader', $student->student_name . ' · ' . $student->batch_no)
 
 @section('content')
- <div class="flex items-center justify-end mb-4">
-  <form method="GET" action="{{ route('students.index') }}" class="flex items-center gap-2">
-   <input type="text" name="batch" placeholder="Search batch no..." class="rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-   <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-white text-sm font-medium hover:bg-indigo-700">Search</button>
-  </form>
+ <div class="flex items-center mb-4">
+  <a href="{{ route('students.index') }}" class="inline-flex items-center gap-2 rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-50">
+   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4"><path fill-rule="evenodd" d="M12.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L8.414 10l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
+   Back
+  </a>
  </div>
  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
   <div class="lg:col-span-1 space-y-6">
