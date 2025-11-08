@@ -1,39 +1,46 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('password.store') }}">
-        @csrf
-
-        <!-- Password Reset Token -->
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
-
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                                type="password"
-                                name="password_confirmation" required />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student - Reset Password</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --indigo:#4f46e5; --slate:#334155; --border:#e2e8f0; }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f8fafc;color:#0f172a}
+    .container{min-height:100vh;display:grid;place-items:center;padding:24px}
+    .card{width:100%;max-width:480px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1)}
+    .p-6{padding:24px}
+    label{display:block;font-size:13px;font-weight:600;color:#475569}
+    input{margin-top:6px;width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px}
+    .btn{display:inline-flex;justify-content:center;align-items:center;width:100%;border:0;border-radius:10px;background:var(--indigo);color:#fff;font-weight:600;padding:10px 12px;margin-top:12px}
+    .title{font-weight:700;font-size:18px;color:#2f3640;margin-bottom:8px;text-align:center}
+    .error{color:#dc2626;font-size:13px;margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="p-6">
+        <div class="title">Student - Reset Password</div>
+        @if ($errors->any())
+          <div class="error">{{ $errors->first() }}</div>
+        @endif
+        <form method="POST" action="{{ route('password.store') }}">
+          @csrf
+          <input type="hidden" name="token" value="{{ $request->route('token') }}">
+          <label>Email</label>
+          <input type="email" name="email" value="{{ old('email', $request->email) }}" required />
+          <label style="margin-top:12px">New Password</label>
+          <input type="password" name="password" required />
+          <label style="margin-top:12px">Confirm Password</label>
+          <input type="password" name="password_confirmation" required />
+          <button type="submit" class="btn">Reset Password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

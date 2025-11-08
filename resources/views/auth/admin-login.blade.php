@@ -9,8 +9,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root { --indigo:#4f46e5; --slate:#334155; --border:#e2e8f0; }
-    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f8fafc;color:#0f172a}
-    .container{min-height:100vh;display:grid;place-items:center;padding:24px}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f8fafc;color:#0f172a;position:relative}
+    body::before{content:"";position:fixed;inset:0;background:url('{{ asset('storage/background/bg.jpg') }}') center/cover no-repeat;opacity:.25;z-index:0}
+    .container{min-height:100vh;display:grid;place-items:center;padding:24px;position:relative;z-index:1}
     .card{width:100%;max-width:480px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1)}
     .p-6{padding:24px}
     label{display:block;font-size:13px;font-weight:600;color:#475569}
