@@ -3,49 +3,111 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin - Reset Password</title>
+  <title>Admin Reset Password - Academia Library</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --indigo:#4f46e5; --slate:#334155; --border:#e2e8f0; }
-    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f8fafc;color:#0f172a}
-    .container{min-height:100vh;display:grid;place-items:center;padding:24px}
-    .card{width:100%;max-width:480px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1)}
-    .p-6{padding:24px}
-    label{display:block;font-size:13px;font-weight:600;color:#475569}
-    input{margin-top:6px;width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px}
-    .btn{display:inline-flex;justify-content:center;align-items:center;width:100%;border:0;border-radius:10px;background:var(--indigo);color:#fff;font-weight:600;padding:10px 12px;margin-top:12px}
-    .title{font-weight:700;font-size:18px;color:#2f3640;margin-bottom:8px;text-align:center}
-    .error{color:#dc2626;font-size:13px;margin-top:8px}
-    .msg{font-size:13px;color:#16a34a;margin-top:8px}
-    .link{display:inline-block;margin-top:16px;font-weight:600;color:var(--indigo);text-decoration:none;text-align:center;width:100%}
+    body { font-family: 'Inter', sans-serif; }
   </style>
 </head>
-<body>
-  <div class="container">
-    <div class="card">
-      <div class="p-6">
-        <div class="title">Admin - Reset Password</div>
-        @if (session('status'))
-          <div class="msg">{{ session('status') }}</div>
-        @endif
-        @if ($errors->any())
-          <div class="error">{{ $errors->first() }}</div>
-        @endif
-        <form method="POST" action="{{ route('admin.password.store') }}">
-          @csrf
-          <input type="hidden" name="token" value="{{ $token }}">
-          <label>Email</label>
-          <input type="email" name="email" value="{{ old('email', $email) }}" required />
-          <label style="margin-top:12px">New Password</label>
-          <input type="password" name="password" required />
-          <label style="margin-top:12px">Confirm Password</label>
-          <input type="password" name="password_confirmation" required />
-          <button type="submit" class="btn">Reset Password</button>
-        </form>
-        <a class="link" href="{{ route('admin.login.form') }}">Back to admin login</a>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+  <div class="min-h-screen flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+      <!-- Logo/Brand -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center mb-4">
+          <img src="{{ asset('storage/background/logo.png') }}" alt="Academia Library Logo" class="w-20 h-20 rounded-2xl shadow-lg" />
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900 mb-2">Admin Reset Password</h1>
+        <p class="text-sm text-slate-600">Create a new secure password for your admin account</p>
       </div>
+
+      <!-- Reset Card -->
+      <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5">
+          <h2 class="text-xl font-semibold text-white flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            Set New Password
+          </h2>
+          <p class="text-blue-100 text-sm mt-1">Please enter your new admin password below</p>
+        </div>
+
+        <div class="p-6">
+          @if ($errors->any())
+            <div class="mb-4 p-4 bg-rose-50 border border-rose-200 rounded-lg flex items-start">
+              <svg class="w-5 h-5 text-rose-600 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span class="text-sm text-rose-900">{{ $errors->first() }}</span>
+            </div>
+          @endif
+
+          <form method="POST" action="{{ route('admin.password.store') }}" class="space-y-5">
+            @csrf
+            <input type="hidden" name="token" value="{{ $token }}">
+            
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Admin Email Address</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+                <input type="email" name="email" value="{{ old('email', $email) }}" required
+                       class="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all bg-slate-50"
+                       readonly />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">New Password</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                  </svg>
+                </div>
+                <input type="password" name="password" required
+                       class="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                       placeholder="••••••••" />
+              </div>
+              <p class="mt-2 text-xs text-slate-500">Must be at least 8 characters long</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Confirm Password</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <input type="password" name="password_confirmation" required
+                       class="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                       placeholder="••••••••" />
+              </div>
+              <p class="mt-2 text-xs text-slate-500">Re-enter your new password</p>
+            </div>
+
+            <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-3 px-4 rounded-lg font-medium hover:from-emerald-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all shadow-sm flex items-center justify-center">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Reset Password
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <p class="text-center text-sm text-slate-600 mt-6">
+        © {{ date('Y') }} Academia Library. All rights reserved.
+      </p>
     </div>
   </div>
 </body>

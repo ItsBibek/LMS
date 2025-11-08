@@ -3,21 +3,54 @@
 @section('title', 'Books')
 @section('header', 'Books')
 @section('header_actions')
- <a href="{{ route('books.create') }}" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700">Add Book</a>
+ <a href="{{ route('books.create') }}" class="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 shadow-sm transition-all">
+  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+  </svg>
+  Add Book
+ </a>
 @endsection
-@section('subheader', 'Search by accession number or Title')
+@section('subheader', 'Search and manage your library collection')
 
 @section('content')
- <div class="bg-white border border-slate-200 rounded-xl p-4 md:p-6">
-  <form method="GET" action="{{ route('books.index') }}" class="grid grid-cols-1 md:grid-cols-6 gap-3">
-   <div class="md:col-span-5">
-    <input type="text" name="q" value="{{ $q }}" placeholder="Accession number or Title"
-           autofocus autocomplete="off"
-           class="w-full rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+ <!-- Search Section -->
+ <div class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-xl p-6 md:p-8 shadow-sm mb-6">
+  <div class="flex items-center mb-4">
+   <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center mr-3">
+    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+    </svg>
    </div>
-   <div class="md:col-span-1 flex gap-2">
-    <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700 w-full">Search</button>
-    <a href="{{ route('books.index') }}" class="inline-flex items-center justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-50 w-full">Reset</a>
+   <div>
+    <h3 class="text-lg font-semibold text-slate-900">Search Books</h3>
+    <p class="text-sm text-slate-600">Find books by accession number or title</p>
+   </div>
+  </div>
+  
+  <form method="GET" action="{{ route('books.index') }}" class="space-y-4">
+   <div class="relative">
+    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+     <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+     </svg>
+    </div>
+    <input type="text" name="q" value="{{ $q }}" placeholder="Search by accession number or book title..."
+           autofocus autocomplete="off"
+           class="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all placeholder-slate-400 text-slate-900" />
+   </div>
+   <div class="flex gap-3">
+    <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-2.5 text-white text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm transition-all">
+     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+     </svg>
+     Search
+    </button>
+    <a href="{{ route('books.index') }}" class="inline-flex items-center justify-center rounded-lg border-2 border-slate-200 px-6 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 transition-all">
+     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+     </svg>
+     Clear
+    </a>
    </div>
   </form>
 
@@ -30,27 +63,85 @@
    <div class="mt-4 text-sm text-emerald-700">{{ session('status') }}</div>
   @endif
 
-  <div class="mt-6">
+ </div>
+
+ <!-- Results Section -->
+ <div class="mt-6">
    @if($q === '')
-    <div class="text-center text-slate-500 text-sm py-8">Type an accession number or any part of a book title and press Search.</div>
+    <div class="bg-white border-2 border-dashed border-slate-200 rounded-xl p-12 text-center">
+     <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+      <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+      </svg>
+     </div>
+     <h3 class="text-lg font-semibold text-slate-900 mb-2">Start Searching</h3>
+     <p class="text-sm text-slate-600 mb-4">Enter an accession number or book title above to find books</p>
+     <div class="flex items-center justify-center gap-4 text-xs text-slate-500">
+      <div class="flex items-center">
+       <svg class="w-4 h-4 mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+       </svg>
+       Quick search
+      </div>
+      <div class="flex items-center">
+       <svg class="w-4 h-4 mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+       </svg>
+       Partial matches
+      </div>
+     </div>
+    </div>
    @endif
 
    @if(isset($matches) && $matches && $matches->count() > 0)
-    <div class="bg-white border border-slate-200 rounded-xl">
-     <div class="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
-      <h3 class="text-sm font-semibold text-slate-700">Found {{ method_exists($matches, 'total') ? $matches->total() : $matches->count() }} matching title{{ (method_exists($matches, 'total') ? $matches->total() : $matches->count()) === 1 ? '' : 's' }}</h3>
+    <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+     <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white flex items-center justify-between">
+      <div class="flex items-center">
+       <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+       </svg>
+       <h3 class="text-sm font-semibold text-slate-900">Found {{ method_exists($matches, 'total') ? $matches->total() : $matches->count() }} result{{ (method_exists($matches, 'total') ? $matches->total() : $matches->count()) === 1 ? '' : 's' }}</h3>
+      </div>
       @if(method_exists($matches, 'total'))
-       <div class="text-xs text-slate-500">Page {{ $matches->currentPage() }} of {{ $matches->lastPage() }}</div>
+       <div class="text-xs text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">Page {{ $matches->currentPage() }} of {{ $matches->lastPage() }}</div>
       @endif
      </div>
-     <ul class="divide-y divide-slate-200">
+     <ul class="divide-y divide-slate-100">
       @foreach($matches as $m)
-       <li class="px-4 md:px-6 py-3 hover:bg-slate-50 flex items-center justify-between">
-        <div>
-         <div class="text-sm font-medium text-slate-800">{{ $m->Title ?? '-' }}</div>
-         <div class="text-xs text-slate-500">Accession: {{ $m->Accession_Number }} @if($m->Author) · Author: {{ $m->Author }} @endif</div>
+       <li class="px-6 py-4 hover:bg-slate-50 transition-colors group">
+        <div class="flex items-center justify-between">
+         <div class="flex-1">
+          <div class="flex items-center mb-1">
+           <svg class="w-4 h-4 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+           </svg>
+           <div class="text-sm font-medium text-slate-900 group-hover:text-blue-600 transition-colors">{{ $m->Title ?? '-' }}</div>
+          </div>
+          <div class="flex items-center text-xs text-slate-500 space-x-3 ml-6">
+           <span class="flex items-center">
+            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+            </svg>
+            {{ $m->Accession_Number }}
+           </span>
+           @if($m->Author)
+            <span class="flex items-center">
+             <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+             </svg>
+             {{ $m->Author }}
+            </span>
+           @endif
+          </div>
+         </div>
+         <a href="{{ route('books.index', ['q' => $m->Accession_Number]) }}" class="inline-flex items-center rounded-lg border-2 border-slate-200 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all">
+          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+          View
+         </a>
         </div>
-        <a href="{{ route('books.index', ['q' => $m->Accession_Number]) }}" class="inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium hover:bg-slate-50">View</a>
        </li>
       @endforeach
      </ul>
@@ -159,7 +250,7 @@
          <div class="flex gap-2">
           <form method="POST" action="{{ route('reservations.issue', $activeReservation) }}">
            @csrf
-           <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700">Issue to {{ $activeReservation->user_batch_no }}</button>
+           <button type="submit" class="inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-white text-sm font-medium hover:bg-emerald-700">Issue to {{ $activeReservation->user_batch_no }}</button>
           </form>
           <form method="POST" action="{{ route('reservations.destroy', $activeReservation) }}" onsubmit="return confirm('Delete this reservation?')">
            @csrf
@@ -174,14 +265,14 @@
           <input type="hidden" name="accession" value="{{ $book->Accession_Number }}" />
           <div class="md:col-span-1">
            <label class="block text-sm font-medium text-slate-700">Batch Number</label>
-           <input type="text" name="batch_no" value="{{ old('batch_no') }}" placeholder="e.g. 77A-001" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+           <input type="text" name="batch_no" value="{{ old('batch_no') }}" placeholder="e.g. 77A-001" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
           <div class="md:col-span-1">
            <label class="block text-sm font-medium text-slate-700">Issue Date (optional)</label>
-           <input type="date" name="issue_date" value="{{ old('issue_date') }}" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+           <input type="date" name="issue_date" value="{{ old('issue_date') }}" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
           <div class="md:col-span-1 flex items-end">
-           <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700 w-full">Issue Book</button>
+           <button type="submit" class="inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-white text-sm font-medium hover:bg-emerald-700 w-full">Issue Book</button>
           </div>
          </form>
        @endif
@@ -190,10 +281,30 @@
     </div>
    @else
     @if($q !== '' && (!isset($matches) || ($matches && $matches->count() === 0)))
-     <div class="text-center text-slate-500 text-sm py-8">No books found for "{{ $q }}".</div>
+     <div class="bg-white border border-slate-200 rounded-xl p-12 text-center">
+      <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+       <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+       </svg>
+      </div>
+      <h3 class="text-lg font-semibold text-slate-900 mb-2">No Books Found</h3>
+      <p class="text-sm text-slate-600 mb-6">We couldn't find any books matching "<strong>{{ $q }}</strong>"</p>
+      <div class="flex items-center justify-center gap-3">
+       <a href="{{ route('books.index') }}" class="inline-flex items-center rounded-lg border-2 border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-all">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+        Clear Search
+       </a>
+       <a href="{{ route('books.create') }}" class="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-all">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Add New Book
+       </a>
+      </div>
+     </div>
     @endif
    @endif
   </div>
-
- </div>
 @endsection

@@ -59,6 +59,9 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/books/issues/{issue}/return', [BooksController::class, 'return'])->name('books.return');
     Route::get('/books/create', [BooksController::class, 'create'])->name('books.create');
     Route::post('/books', [BooksController::class, 'store'])->name('books.store');
+    Route::get('/books/bulk-import', [BooksController::class, 'showBulkImport'])->name('books.bulk-import');
+    Route::post('/books/bulk-import', [BooksController::class, 'bulkImport'])->name('books.bulk-import.store');
+    Route::get('/books/download-template', [BooksController::class, 'downloadTemplate'])->name('books.download-template');
     Route::get('/books/{book}/edit', [BooksController::class, 'edit'])->name('books.edit');
     Route::match(['put','patch'],'/books/{book}', [BooksController::class, 'update'])->name('books.update');
     Route::delete('/books/{book}', [BooksController::class, 'destroy'])->name('books.destroy');
@@ -72,6 +75,9 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/students/manage', [StudentsController::class, 'manage'])->name('students.manage');
     Route::get('/students/create', [StudentsController::class, 'createStudent'])->name('students.create');
     Route::post('/students', [StudentsController::class, 'store'])->name('students.store');
+    Route::get('/students/bulk-import', [StudentsController::class, 'showBulkImport'])->name('students.bulk-import');
+    Route::post('/students/bulk-import', [StudentsController::class, 'bulkImport'])->name('students.bulk-import.store');
+    Route::get('/students/download-template', [StudentsController::class, 'downloadTemplate'])->name('students.download-template');
     Route::get('/students/{student}/edit', [StudentsController::class, 'edit'])->name('students.edit');
     Route::match(['put','patch'],'/students/{student}', [StudentsController::class, 'update'])->name('students.update');
     Route::delete('/students/{student}', [StudentsController::class, 'destroy'])->name('students.destroy');
@@ -84,6 +90,7 @@ Route::middleware('auth:admin')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/student/profile', [StudentProfileController::class, 'profile'])->name('student.profile');
+    Route::get('/student/books/search', [StudentProfileController::class, 'searchBooks'])->name('student.books.search');
     Route::post('/student/reservations', [ReservationController::class, 'store'])->name('student.reservations.store');
     Route::delete('/student/reservations/{reservation}', [ReservationController::class, 'cancel'])->name('student.reservations.cancel');
 });

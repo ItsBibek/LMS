@@ -53,7 +53,7 @@
          @if($expires->isFuture())
           <form method="POST" action="{{ route('reservations.issue', $r) }}" class="inline">
            @csrf
-           <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-white text-sm font-medium hover:bg-indigo-700">Issue</button>
+           <button type="submit" class="inline-flex items-center justify-center rounded-md bg-emerald-600 px-3 py-2 text-white text-sm font-medium hover:bg-emerald-700">Issue</button>
           </form>
          @endif
          <form method="POST" action="{{ route('reservations.destroy', $r) }}" class="inline" onsubmit="return confirm('Decline this reservation?')">

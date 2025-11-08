@@ -8,6 +8,9 @@ use App\Models\Issue;
 use App\Models\User;
 use App\Models\Reservation;
 use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class BooksController extends Controller
 {
@@ -237,5 +240,128 @@ class BooksController extends Controller
 
         return redirect()->route('books.index', ['q' => $issue->Accession_Number])
             ->with('status', 'Book returned successfully.');
+    }
+
+    public function showBulkImport()
+    {
+        return view('books.bulk-import');
+    }
+
+    public function downloadTemplate()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        // Set headers
+        $sheet->setCellValue('A1', 'Accession_Number');
+        $sheet->setCellValue('B1', 'Title');
+        $sheet->setCellValue('C1', 'Author');
+        
+        // Style headers
+        $sheet->getStyle('A1:C1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:C1')->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFE2E8F0');
+        
+        // Add sample data
+        $sheet->setCellValue('A2', 'ACC-0001');
+        $sheet->setCellValue('B2', 'Sample Book Title');
+        $sheet->setCellValue('C2', 'Sample Author');
+        
+        // Auto-size columns
+        foreach (range('A', 'C') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'books_import_template.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+        
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function bulkImport(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls', 'max:2048'],
+        ]);
+
+        try {
+            $file = $request->file('file');
+            $spreadsheet = IOFactory::load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+            
+            // Remove header row
+            $headers = array_shift($rows);
+            
+            $imported = 0;
+            $skipped = 0;
+            $errors = [];
+            
+            foreach ($rows as $index => $row) {
+                $rowNumber = $index + 2; // +2 because we removed header and Excel is 1-indexed
+                
+                // Skip empty rows
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+                
+                $accessionNumber = trim($row[0] ?? '');
+                $title = trim($row[1] ?? '');
+                $author = trim($row[2] ?? '');
+                
+                // Validate required fields
+                if (empty($accessionNumber) || empty($title)) {
+                    $errors[] = "Row {$rowNumber}: Accession Number and Title are required";
+                    $skipped++;
+                    continue;
+                }
+                
+                // Check if book with same Accession Number already exists
+                // Note: Title and Author can have duplicates (e.g., multiple copies)
+                if (Book::where('Accession_Number', $accessionNumber)->exists()) {
+                    $errors[] = "Row {$rowNumber}: Accession number '{$accessionNumber}' already exists";
+                    $skipped++;
+                    continue;
+                }
+                
+                // Create book (duplicates are allowed for Title and Author)
+                Book::create([
+                    'Accession_Number' => $accessionNumber,
+                    'Title' => $title,
+                    'Author' => $author ?: null,
+                ]);
+                
+                $imported++;
+            }
+            
+            // Always show results, even if there are errors
+            $message = 'Bulk import completed!';
+            if ($imported > 0) {
+                $message .= " Successfully imported {$imported} book(s).";
+            }
+            if ($skipped > 0) {
+                $message .= " Skipped {$skipped} row(s) due to errors.";
+            }
+            
+            $redirect = redirect()->route('books.bulk-import')
+                ->with('status', $message)
+                ->with('imported', $imported)
+                ->with('skipped', $skipped);
+            
+            if (!empty($errors)) {
+                $redirect->withErrors($errors);
+            }
+            
+            return $redirect;
+                
+        } catch (\Exception $e) {
+            return back()->withErrors(['file' => 'Error processing file: ' . $e->getMessage()]);
+        }
     }
 }

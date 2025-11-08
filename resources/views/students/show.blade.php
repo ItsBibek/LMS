@@ -2,64 +2,138 @@
 
 @section('title', 'Student Profile')
 @section('header', 'Student Profile')
-@section('subheader', $student->student_name . ' · ' . $student->batch_no)
-
-@section('content')
- <div class="flex items-center mb-4">
-  <a href="{{ route('students.index') }}" class="inline-flex items-center gap-2 rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-50">
-   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4"><path fill-rule="evenodd" d="M12.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L8.414 10l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
-   Back
+@section('header_actions')
+ <div class="flex items-center gap-3">
+  <a href="{{ route('students.index') }}" class="inline-flex items-center gap-2 rounded-lg border-2 border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-all">
+   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+   </svg>
+   Back to Search
+  </a>
+  <a href="{{ route('students.manage') }}" class="inline-flex items-center gap-2 rounded-lg border-2 border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-all">
+   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+   </svg>
+   Manage Students
+  </a>
+  <a href="{{ route('students.edit', $student) }}" class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 shadow-sm transition-all">
+   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+   </svg>
+   Edit Profile
   </a>
  </div>
+@endsection
+@section('subheader', 'Complete student information and book management')
+
+@section('content')
  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- LEFT SIDEBAR -->
   <div class="lg:col-span-1 space-y-6">
-   <div class="bg-white border border-slate-200 rounded-xl p-6">
-    <div class="flex items-start gap-4">
+   <!-- Student Info Card -->
+   <div class="bg-gradient-to-br from-blue-500 to-blue-500 rounded-xl p-6 text-white shadow-lg">
+    <div class="flex flex-col items-center text-center">
      @if ($student->photo_path && Storage::disk('public')->exists($student->photo_path))
-      <img src="{{ Storage::url($student->photo_path) }}" alt="Photo of {{ $student->student_name }}" class="w-16 h-16 rounded-full object-cover" />
+      <img src="{{ Storage::url($student->photo_path) }}" alt="Photo of {{ $student->student_name }}" class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg mb-4" />
      @else
-      <div class="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xl">{{ strtoupper(substr($student->student_name, 0, 1)) }}</div>
+      <div class="w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm border-4 border-white flex items-center justify-center text-white text-3xl font-bold shadow-lg mb-4">
+       {{ strtoupper(substr($student->student_name, 0, 1)) }}
+      </div>
      @endif
-     <div>
-      <div class="text-base font-semibold">{{ $student->student_name }}</div>
-      <div class="text-sm text-slate-500">Batch: {{ $student->batch_no }}</div>
-      <div class="text-sm text-slate-500">Faculty: {{ $student->faculty }}</div>
-      <div class="text-sm text-slate-500 break-all">{{ $student->email }}</div>
+     <h2 class="text-xl font-bold mb-1">{{ $student->student_name }}</h2>
+     <div class="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-medium mb-3">
+      <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+      </svg>
+      {{ $student->batch_no }}
+     </div>
+    </div>
+    <div class="mt-4 pt-4 border-t border-white/20 space-y-2">
+     <div class="flex items-center justify-between text-sm">
+      <span class="text-emerald-100 flex items-center">
+       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+       </svg>
+       Faculty
+      </span>
+      <span class="font-medium">{{ $student->faculty }}</span>
+     </div>
+     <div class="flex items-center justify-between text-sm">
+      <span class="text-emerald-100 flex items-center">
+       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+       </svg>
+       Email
+      </span>
+      <span class="font-medium truncate ml-2">{{ $student->email ?: 'N/A' }}</span>
      </div>
     </div>
    </div>
 
-   <div class="bg-white border border-slate-200 rounded-xl p-6">
-    <h3 class="text-sm font-semibold text-slate-700">Issue a Book</h3>
+   <!-- Quick Issue Book -->
+   <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+    <div class="flex items-center mb-4">
+     <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center mr-3">
+      <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+      </svg>
+     </div>
+     <h3 class="text-base font-semibold text-slate-900">Issue Book</h3>
+    </div>
     @if ($errors->getBag('issue')->any())
-     <div class="mt-3 text-sm text-rose-600">
-      {{ $errors->getBag('issue')->first() }}
+     <div class="mb-3 p-3 bg-rose-50 border border-rose-200 rounded-lg flex items-start">
+      <svg class="w-5 h-5 text-rose-600 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <span class="text-sm text-rose-900">{{ $errors->getBag('issue')->first() }}</span>
      </div>
     @endif
     @if (session('status'))
-     <div class="mt-3 text-sm text-emerald-700">{{ session('status') }}</div>
+     <div class="mb-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center">
+      <svg class="w-5 h-5 text-emerald-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <span class="text-sm text-emerald-900 font-medium">{{ session('status') }}</span>
+     </div>
     @endif
-    <form method="POST" action="{{ route('students.issue', $student) }}" class="mt-4 space-y-3">
+    <form method="POST" action="{{ route('students.issue', $student) }}" class="space-y-4">
      @csrf
      <div>
-      <label class="block text-sm font-medium text-slate-700">Accession Number</label>
-      <input type="text" name="accession" value="{{ old('accession') }}" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. ACC-0001" />
+      <label class="block text-sm font-medium text-slate-700 mb-2">Accession Number</label>
+      <div class="relative">
+       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+        </svg>
+       </div>
+       <input type="text" name="accession" value="{{ old('accession') }}" class="w-full pl-10 pr-4 py-2.5 rounded-lg border-2 border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all" placeholder="e.g. ACC-0001" autofocus />
+      </div>
      </div>
      <div>
-      <label class="block text-sm font-medium text-slate-700">Issue Date (optional)</label>
-      <input type="date" name="issue_date" value="{{ old('issue_date') }}" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+      <label class="block text-sm font-medium text-slate-700 mb-2">Issue Date <span class="text-slate-500 text-xs">(optional)</span></label>
+      <input type="date" name="issue_date" value="{{ old('issue_date') }}" class="w-full px-4 py-2.5 rounded-lg border-2 border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all" />
      </div>
-     <div>
-      <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700">Issue Book</button>
-     </div>
+     <button type="submit" class="w-full inline-flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-white text-sm font-medium hover:bg-emerald-700 shadow-sm transition-all">
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+      </svg>
+      Issue Book to Student
+     </button>
     </form>
    </div>
   </div>
 
+  <!-- MAIN CONTENT AREA -->
   <div class="lg:col-span-2 space-y-6">
-  <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
-   <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-    <h3 class="text-sm font-semibold text-slate-700">Reserved</h3>
+  <!-- Reserved Books -->
+  <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+   <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white flex items-center justify-between">
+    <div class="flex items-center">
+     <svg class="w-5 h-5 text-amber-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+     </svg>
+     <h3 class="text-base font-semibold text-slate-900">Reserved Books</h3>
+    </div>
    </div>
    @php($activeReservations = $student->reservations()->where('status','pending')->latest('reserved_at')->paginate(10))
    <div class="overflow-x-auto">
@@ -94,7 +168,7 @@
           <div class="inline-flex items-center gap-2">
            <form method="POST" action="{{ route('reservations.issue', $r) }}" class="inline">
             @csrf
-            <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-white text-sm font-medium hover:bg-indigo-700">Issue</button>
+            <button type="submit" class="inline-flex items-center justify-center rounded-md bg-emerald-600 px-3 py-2 text-white text-sm font-medium hover:bg-emerald-700">Issue</button>
            </form>
            <form method="POST" action="{{ route('reservations.destroy', $r) }}" class="inline" onsubmit="return confirm('Decline this reservation?')">
             @csrf
@@ -126,9 +200,18 @@
     </div>
    @endif
   </div>
-   <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
-    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-     <h3 class="text-sm font-semibold text-slate-700">Currently Issued</h3>
+   <!-- Currently Issued Books -->
+   <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+    <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white flex items-center justify-between">
+     <div class="flex items-center">
+      <svg class="w-5 h-5 text-emerald-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+      </svg>
+      <h3 class="text-base font-semibold text-slate-900">Currently Issued Books</h3>
+     </div>
+     <span class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-800">
+      {{ $student->currentIssues->count() }} active
+     </span>
     </div>
     <div class="overflow-x-auto">
      <table class="min-w-full divide-y divide-slate-200">
@@ -187,9 +270,15 @@
     </div>
    </div>
 
-   <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
-    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-     <h3 class="text-sm font-semibold text-slate-700">History</h3>
+   <!-- History -->
+   <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+    <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white flex items-center justify-between">
+     <div class="flex items-center">
+      <svg class="w-5 h-5 text-slate-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <h3 class="text-base font-semibold text-slate-900">Borrowing History</h3>
+     </div>
     </div>
     <div class="overflow-x-auto">
      <table class="min-w-full divide-y divide-slate-200">
@@ -241,21 +330,21 @@
    <div class="grid grid-cols-1 gap-3">
     <div>
      <label class="block text-sm font-medium text-slate-700">Accession No.</label>
-     <input id="edit-accession" type="text" name="accession" value="" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+     <input id="edit-accession" type="text" name="accession" value="" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
      <div>
       <label class="block text-sm font-medium text-slate-700">Issue Date</label>
-      <input id="edit-issue-date" type="date" name="issue_date" value="" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+      <input id="edit-issue-date" type="date" name="issue_date" value="" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
      </div>
      <div>
       <label class="block text-sm font-medium text-slate-700">Due Date</label>
-      <input id="edit-due-date" type="date" name="due_date" value="" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+      <input id="edit-due-date" type="date" name="due_date" value="" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
      </div>
     </div>
    </div>
    <div class="mt-4 flex items-center gap-2">
-    <button type="submit" class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-white text-sm font-medium hover:bg-indigo-700">Save</button>
+    <button type="submit" class="inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-white text-sm font-medium hover:bg-emerald-700">Save</button>
     <button type="button" class="inline-flex items-center justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-medium hover:bg-slate-50" onclick="document.getElementById('editIssueModal').classList.add('hidden')">Cancel</button>
    </div>
   </form>

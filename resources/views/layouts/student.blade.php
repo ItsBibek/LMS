@@ -15,9 +15,12 @@
    <div class="max-w-6xl mx-auto">
     <header class="mb-6">
      <div class="flex items-center justify-between gap-3">
-      <div>
-       <h1 class="text-xl font-semibold">@yield('header', 'Profile')</h1>
-       <p class="text-sm text-slate-500">@yield('subheader')</p>
+      <div class="flex items-center gap-3">
+       <img src="{{ asset('storage/background/logo.png') }}" alt="Academia Library" class="w-10 h-10 rounded-lg" />
+       <div>
+        <h1 class="text-xl font-semibold">@yield('header', 'Profile')</h1>
+        <p class="text-sm text-slate-500">@yield('subheader')</p>
+       </div>
       </div>
       @auth
        <form method="POST" action="{{ route('logout') }}">

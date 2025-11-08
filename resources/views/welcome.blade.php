@@ -7,9 +7,14 @@
 
 @section('content')
  <div class="mb-6">
-  <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 rounded-xl p-6 text-white">
-   <h2 class="text-2xl font-bold">Welcome Back, Admin! 👋</h2>
-   <p class="mt-2 text-indigo-100">Here's what's happening in your library today.</p>
+  <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-6 text-white shadow-lg">
+   <div class="flex items-center gap-4">
+    <img src="{{ asset('storage/background/logo.png') }}" alt="Academia Library" class="w-16 h-16 rounded-xl border-2 border-white/20" />
+    <div>
+     <h2 class="text-2xl font-bold">Welcome Back, Admin! 👋</h2>
+     <p class="mt-1 text-blue-100">Here's what's happening in your library today.</p>
+    </div>
+   </div>
   </div>
  </div>
 
@@ -17,30 +22,30 @@
   <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow transition-shadow">
    <div class="flex items-center justify-between">
     <p class="text-sm text-slate-500">Total Books</p>
-    <span class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-indigo-50 text-indigo-600">📚</span>
+    <span class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-blue-50 text-blue-600">📚</span>
    </div>
    <p class="mt-2 text-3xl font-semibold">{{ $booksCount }}</p>
   </div>
   <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow transition-shadow">
    <div class="flex items-center justify-between">
     <p class="text-sm text-slate-500">Members</p>
-    <span class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-indigo-50 text-indigo-600">👥</span>
+    <span class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-blue-50 text-blue-600">👥</span>
    </div>
    <p class="mt-2 text-3xl font-semibold">{{ $membersCount }}</p>
   </div>
   <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow transition-shadow">
    <div class="flex items-center justify-between">
     <p class="text-sm text-slate-500">Active Borrows</p>
-    <span class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-indigo-50 text-indigo-600">📄</span>
+    <span class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-cyan-50 text-cyan-600">📄</span>
    </div>
    <p class="mt-2 text-3xl font-semibold">{{ $activeLoansCount }}</p>
   </div>
   <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow transition-shadow">
    <div class="flex items-center justify-between">
     <p class="text-sm text-slate-500">Overdue</p>
-    <span class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-indigo-50 text-indigo-600">⏰</span>
+    <span class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-rose-50 text-rose-600">⏰</span>
    </div>
-   <p class="mt-2 text-3xl font-semibold">{{ $overdueCount }}</p>
+   <p class="mt-2 text-3xl font-semibold text-rose-600">{{ $overdueCount }}</p>
   </div>
  </section>
 
@@ -51,7 +56,7 @@
    </div>
    <div class="p-6 space-y-3">
     <a href="{{ route('books.create') }}" class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
-     <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+     <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
       </svg>

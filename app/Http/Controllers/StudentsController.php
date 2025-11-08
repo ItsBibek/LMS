@@ -10,6 +10,9 @@ use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class StudentsController extends Controller
 {
@@ -260,5 +263,145 @@ class StudentsController extends Controller
     {
         $student->delete();
         return redirect()->route('students.manage')->with('status', 'Student deleted successfully.');
+    }
+
+    public function showBulkImport()
+    {
+        return view('students.bulk-import');
+    }
+
+    public function downloadTemplate()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        // Set headers
+        $sheet->setCellValue('A1', 'Student_Name');
+        $sheet->setCellValue('B1', 'Batch_Number');
+        $sheet->setCellValue('C1', 'Faculty');
+        $sheet->setCellValue('D1', 'Email');
+        
+        // Style headers
+        $sheet->getStyle('A1:D1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:D1')->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFE2E8F0');
+        
+        // Add sample data
+        $sheet->setCellValue('A2', 'John Doe');
+        $sheet->setCellValue('B2', '078CSIT01');
+        $sheet->setCellValue('C2', 'CSIT');
+        $sheet->setCellValue('D2', 'john.doe@example.com');
+        
+        // Auto-size columns
+        foreach (range('A', 'D') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'students_import_template.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        header('Cache-Control: max-age=0');
+        
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function bulkImport(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls', 'max:2048'],
+        ]);
+
+        try {
+            $file = $request->file('file');
+            $spreadsheet = IOFactory::load($file->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+            
+            // Remove header row
+            $headers = array_shift($rows);
+            
+            $imported = 0;
+            $skipped = 0;
+            $errors = [];
+            
+            foreach ($rows as $index => $row) {
+                $rowNumber = $index + 2; // +2 because we removed header and Excel is 1-indexed
+                
+                // Skip empty rows
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+                
+                $studentName = trim($row[0] ?? '');
+                $batchNo = trim($row[1] ?? '');
+                $faculty = trim($row[2] ?? '');
+                $email = trim($row[3] ?? '');
+                
+                // Validate required fields
+                if (empty($studentName) || empty($batchNo)) {
+                    $errors[] = "Row {$rowNumber}: Student Name and Batch Number are required";
+                    $skipped++;
+                    continue;
+                }
+                
+                // Validate email format if provided
+                if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $errors[] = "Row {$rowNumber}: Invalid email format";
+                    $skipped++;
+                    continue;
+                }
+                
+                // Check if batch number already exists
+                if (User::where('batch_no', $batchNo)->exists()) {
+                    $errors[] = "Row {$rowNumber}: Batch number '{$batchNo}' already exists";
+                    $skipped++;
+                    continue;
+                }
+                
+                // Check if email already exists (only if email is provided)
+                if (!empty($email) && User::where('email', $email)->exists()) {
+                    $errors[] = "Row {$rowNumber}: Email '{$email}' is already in use";
+                    $skipped++;
+                    continue;
+                }
+                
+                // Create student (no try-catch needed as we've already validated uniqueness)
+                User::create([
+                    'student_name' => $studentName,
+                    'batch_no' => $batchNo,
+                    'faculty' => $faculty ?: null,
+                    'email' => !empty($email) ? $email : null,
+                ]);
+                
+                $imported++;
+            }
+            
+            // Always show results, even if there are errors
+            $message = 'Bulk import completed!';
+            if ($imported > 0) {
+                $message .= " Successfully imported {$imported} student(s).";
+            }
+            if ($skipped > 0) {
+                $message .= " Skipped {$skipped} row(s) due to errors.";
+            }
+            
+            $redirect = redirect()->route('students.bulk-import')
+                ->with('status', $message)
+                ->with('imported', $imported)
+                ->with('skipped', $skipped);
+            
+            if (!empty($errors)) {
+                $redirect->withErrors($errors);
+            }
+            
+            return $redirect;
+                
+        } catch (\Exception $e) {
+            return back()->withErrors(['file' => 'Error processing file: ' . $e->getMessage()]);
+        }
     }
 }
