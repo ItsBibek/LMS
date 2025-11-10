@@ -41,6 +41,43 @@ Route::get('/student/login', function() { return redirect('/'); });
 Route::middleware('auth:admin')->group(function () {
     Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
+    // Test route for fine warning emails
+    Route::get('/test-fine-warning', function () {
+        $tomorrow = Carbon::tomorrow()->toDateString();
+        $issuesDueTomorrow = Issue::whereNull('return_date')
+            ->where('due_date', $tomorrow)
+            ->with(['user', 'book'])
+            ->get();
+
+        $results = [];
+        $results['tomorrow_date'] = $tomorrow;
+        $results['issues_found'] = $issuesDueTomorrow->count();
+        
+        foreach ($issuesDueTomorrow as $issue) {
+            $student = $issue->user;
+            $results['issues'][] = [
+                'issue_id' => $issue->id,
+                'book' => $issue->book?->Title ?? 'N/A',
+                'student_name' => $student?->name ?? 'N/A',
+                'student_email' => $student?->email ?? 'N/A',
+                'due_date' => $issue->due_date,
+            ];
+
+            if ($student && $student->email) {
+                try {
+                    \Mail::to($student->email)->send(new \App\Mail\FineWarningMail($issue));
+                    $results['sent'][] = "Email sent to {$student->email} for issue #{$issue->id}";
+                } catch (\Exception $e) {
+                    $results['errors'][] = "Failed to send to {$student->email}: " . $e->getMessage();
+                }
+            } else {
+                $results['skipped'][] = "Issue #{$issue->id} - No email for student";
+            }
+        }
+
+        return response()->json($results);
+    })->name('test.fine.warning');
+
     Route::get('/dashboard', function () {
         $booksCount = Book::count();
         $membersCount = User::count();

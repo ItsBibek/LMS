@@ -16,6 +16,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+        
+        // Note: Fine warnings are now sent automatically via FineWarningServiceProvider
+        // No scheduler setup required!
     }
 
     /**
