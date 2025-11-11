@@ -29,7 +29,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
        </svg>
       </div>
-      <input type="text" name="batch" value="{{ old('batch', $batch ?? '') }}" placeholder="e.g., 078CSIT01" autofocus autocomplete="off" class="w-full pl-10 pr-4 py-2.5 rounded-lg border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all placeholder-slate-400" />
+      <input type="text" name="batch" id="studentBatchInput" value="{{ old('batch', $batch ?? '') }}" placeholder="e.g., 078CSIT01" autofocus autocomplete="off" class="w-full pl-10 pr-4 py-2.5 rounded-lg border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all placeholder-slate-400" />
      </div>
      <p class="mt-1.5 text-xs text-slate-500">Scan card or type batch number manually</p>
     </div>
@@ -184,4 +184,17 @@
    @endif
   </div>
  </div>
+
+<script>
+// Clear batch number field after successful search
+@if(($batch ?? '') !== '')
+    setTimeout(function() {
+        const batchInput = document.getElementById('studentBatchInput');
+        if (batchInput) {
+            batchInput.value = '';
+            batchInput.focus();
+        }
+    }, 100);
+@endif
+</script>
 @endsection

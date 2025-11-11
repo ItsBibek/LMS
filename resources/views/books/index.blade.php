@@ -34,7 +34,7 @@
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
      </svg>
     </div>
-    <input type="text" name="q" value="{{ $q }}" placeholder="Search by accession number or book title..."
+    <input type="text" name="q" id="bookSearchInput" value="{{ $q }}" placeholder="Search by accession number or book title..."
            autofocus autocomplete="off"
            class="w-full pl-10 pr-4 py-3 rounded-lg border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all placeholder-slate-400 text-slate-900" />
    </div>
@@ -321,4 +321,17 @@
     @endif
    @endif
   </div>
+
+<script>
+// Clear search field after successful search
+@if($q !== '')
+    setTimeout(function() {
+        const searchInput = document.getElementById('bookSearchInput');
+        if (searchInput) {
+            searchInput.value = '';
+            searchInput.focus();
+        }
+    }, 100);
+@endif
+</script>
 @endsection

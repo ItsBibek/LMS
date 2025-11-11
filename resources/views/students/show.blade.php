@@ -1,7 +1,21 @@
 @extends('layouts.app')
 
 @section('title', 'Student Profile')
-@section('header', 'Student Profile')
+@section('header')
+ <!-- Student Search Bar -->
+ <div class="flex items-center gap-4 w-full">
+  <form method="GET" action="{{ route('students.index') }}" class="flex-1 max-w-2xl">
+   <div class="relative">
+    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+     <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+     </svg>
+    </div>
+    <input type="text" name="batch" id="quickStudentSearch" placeholder="Search student by batch number..." autocomplete="off" class="w-full pl-10 pr-4 py-2.5 rounded-lg border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all placeholder-slate-400 text-slate-900" />
+   </div>
+  </form>
+ </div>
+@endsection
 @section('header_actions')
  <div class="flex items-center gap-3">
   <a href="{{ route('students.index') }}" class="inline-flex items-center gap-2 rounded-lg border-2 border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-all">
@@ -24,7 +38,6 @@
   </a>
  </div>
 @endsection
-@section('subheader', 'Complete student information and book management')
 
 @section('content')
  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -394,6 +407,15 @@
     if (dueDate) dueDate.value = oldDueDate || '';
     if (modal) modal.classList.remove('hidden');
   }
+ })();
+
+ // Auto-clear student search bar (but don't focus it)
+ (function() {
+    const quickSearch = document.getElementById('quickStudentSearch');
+    if (quickSearch) {
+        // Clear the search field but keep focus on accession number field
+        quickSearch.value = '';
+    }
  })();
 </script>
 @endsection
