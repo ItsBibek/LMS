@@ -134,13 +134,21 @@
            @endif
           </div>
          </div>
-         <a href="{{ route('books.index', ['q' => $m->Accession_Number]) }}" class="inline-flex items-center rounded-lg border-2 border-slate-200 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all">
-          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-          </svg>
-          View
-         </a>
+         <div class="flex items-center gap-2">
+          <a href="{{ route('books.barcode-view', $m->Accession_Number) }}" class="inline-flex items-center rounded-lg border-2 border-blue-200 bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all" title="Generate Barcode">
+           <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+           </svg>
+           Barcode
+          </a>
+          <a href="{{ route('books.index', ['q' => $m->Accession_Number]) }}" class="inline-flex items-center rounded-lg border-2 border-slate-200 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all">
+           <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+           </svg>
+           View
+          </a>
+         </div>
         </div>
        </li>
       @endforeach
@@ -174,7 +182,13 @@
         <button type="button" id="book-actions-btn" class="inline-flex items-center justify-center rounded-md border border-slate-300 px-2.5 py-1.5 text-xs font-medium hover:bg-slate-50">
          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
         </button>
-        <div id="book-actions-menu" class="hidden absolute right-0 mt-2 w-40 rounded-md border border-slate-200 bg-white shadow-lg z-10">
+        <div id="book-actions-menu" class="hidden absolute right-0 mt-2 w-48 rounded-md border border-slate-200 bg-white shadow-lg z-10">
+         <a href="{{ route('books.barcode-view', $book->Accession_Number) }}" class="block px-3 py-2 text-sm hover:bg-blue-50 text-blue-700 border-b border-slate-100">
+          <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+          </svg>
+          Generate Barcode
+         </a>
          <a href="{{ route('books.edit', $book->Accession_Number) }}" class="block px-3 py-2 text-sm hover:bg-slate-50">Edit</a>
          <form method="POST" action="{{ route('books.destroy', $book->Accession_Number) }}" onsubmit="return confirm('Delete this book? This will not remove past issue history. Continue?')">
           @csrf

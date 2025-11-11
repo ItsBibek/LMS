@@ -151,12 +151,20 @@
             </span>
            </div>
           </div>
-          <a href="{{ route('students.show', $s) }}" class="inline-flex items-center rounded-lg border-2 border-slate-200 px-3 py-1.5 text-xs font-medium hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 transition-all">
-           <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-           </svg>
-           View Profile
-          </a>
+          <div class="flex items-center gap-2">
+           <a href="{{ route('students.barcode-view', $s->batch_no) }}" class="inline-flex items-center rounded-lg border-2 border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100 hover:border-blue-300 transition-all" title="Generate Barcode">
+            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+            </svg>
+            Barcode
+           </a>
+           <a href="{{ route('students.show', $s) }}" class="inline-flex items-center rounded-lg border-2 border-slate-200 px-3 py-1.5 text-xs font-medium hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 transition-all">
+            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            View Profile
+           </a>
+          </div>
          </div>
         </li>
        @endforeach

@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 
 class BooksController extends Controller
 {
@@ -28,6 +29,12 @@ class BooksController extends Controller
         ]);
 
         Book::create($data);
+
+        // Check if user wants to generate barcode
+        if ($request->has('generate_barcode') && $request->generate_barcode == '1') {
+            return redirect()->route('books.barcode-view', $data['Accession_Number'])
+                ->with('status', 'Book added successfully. Barcode generated.');
+        }
 
         return redirect()->route('books.index', ['q' => $data['Accession_Number']])
             ->with('status', 'Book added successfully.');
@@ -363,5 +370,36 @@ class BooksController extends Controller
         } catch (\Exception $e) {
             return back()->withErrors(['file' => 'Error processing file: ' . $e->getMessage()]);
         }
+    }
+
+    public function generateBarcode($accessionNumber)
+    {
+        // Find the book
+        $book = Book::where('Accession_Number', $accessionNumber)->first();
+        
+        if (!$book) {
+            abort(404, 'Book not found');
+        }
+
+        // Generate Code 39 barcode
+        $generator = new BarcodeGeneratorPNG();
+        $barcode = $generator->getBarcode($book->Accession_Number, $generator::TYPE_CODE_39, 3, 80);
+
+        // Return as image response
+        return response($barcode)
+            ->header('Content-Type', 'image/png')
+            ->header('Content-Disposition', 'inline; filename="barcode-' . $book->Accession_Number . '.png"');
+    }
+
+    public function showBarcodeView($accessionNumber)
+    {
+        // Find the book
+        $book = Book::where('Accession_Number', $accessionNumber)->first();
+        
+        if (!$book) {
+            abort(404, 'Book not found');
+        }
+
+        return view('books.barcode', compact('book'));
     }
 }

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 
 class StudentsController extends Controller
 {
@@ -403,5 +404,36 @@ class StudentsController extends Controller
         } catch (\Exception $e) {
             return back()->withErrors(['file' => 'Error processing file: ' . $e->getMessage()]);
         }
+    }
+
+    public function generateBarcode($batchNo)
+    {
+        // Find the student
+        $student = User::where('batch_no', $batchNo)->first();
+        
+        if (!$student) {
+            abort(404, 'Student not found');
+        }
+
+        // Generate Code 128 barcode
+        $generator = new BarcodeGeneratorPNG();
+        $barcode = $generator->getBarcode($student->batch_no, $generator::TYPE_CODE_128, 3, 80);
+
+        // Return as image response
+        return response($barcode)
+            ->header('Content-Type', 'image/png')
+            ->header('Content-Disposition', 'inline; filename="barcode-' . $student->batch_no . '.png"');
+    }
+
+    public function showBarcodeView($batchNo)
+    {
+        // Find the student
+        $student = User::where('batch_no', $batchNo)->first();
+        
+        if (!$student) {
+            abort(404, 'Student not found');
+        }
+
+        return view('students.barcode', compact('student'));
     }
 }

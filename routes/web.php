@@ -102,6 +102,8 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/books/{book}/edit', [BooksController::class, 'edit'])->name('books.edit');
     Route::match(['put','patch'],'/books/{book}', [BooksController::class, 'update'])->name('books.update');
     Route::delete('/books/{book}', [BooksController::class, 'destroy'])->name('books.destroy');
+    Route::get('/books/{accessionNumber}/barcode', [BooksController::class, 'generateBarcode'])->name('books.barcode');
+    Route::get('/books/{accessionNumber}/barcode-view', [BooksController::class, 'showBarcodeView'])->name('books.barcode-view');
 
     // Reservations (admin)
     Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
@@ -118,6 +120,8 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('/students/{student}/edit', [StudentsController::class, 'edit'])->name('students.edit');
     Route::match(['put','patch'],'/students/{student}', [StudentsController::class, 'update'])->name('students.update');
     Route::delete('/students/{student}', [StudentsController::class, 'destroy'])->name('students.destroy');
+    Route::get('/students/{batchNo}/barcode', [StudentsController::class, 'generateBarcode'])->name('students.barcode');
+    Route::get('/students/{batchNo}/barcode-view', [StudentsController::class, 'showBarcodeView'])->name('students.barcode-view');
 
     Route::get('/students/{student}', [StudentsController::class, 'show'])->name('students.show');
     Route::post('/students/{student}/issue', [StudentsController::class, 'issue'])->name('students.issue');
