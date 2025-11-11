@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -225,8 +226,14 @@ class StudentsController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
-            $data['photo_path'] = $request->file('photo')->store('students', 'public');
+            $file = $request->file('photo');
+            $extension = $file->getClientOriginalExtension();
+            $filename = $data['batch_no'] . '_' . time() . '.' . $extension;
+            $data['photo_path'] = $file->storeAs('students', $filename, 'public');
         }
+
+        // Set default password
+        $data['password'] = Hash::make('Academia123');
 
         $student = User::create($data);
 
@@ -249,10 +256,15 @@ class StudentsController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
+            // Delete old photo if exists
             if (!empty($student->photo_path)) {
                 Storage::disk('public')->delete($student->photo_path);
             }
-            $data['photo_path'] = $request->file('photo')->store('students', 'public');
+            // Store new photo with batch_no based filename
+            $file = $request->file('photo');
+            $extension = $file->getClientOriginalExtension();
+            $filename = $data['batch_no'] . '_' . time() . '.' . $extension;
+            $data['photo_path'] = $file->storeAs('students', $filename, 'public');
         }
 
         $student->update($data);
@@ -262,6 +274,11 @@ class StudentsController extends Controller
 
     public function destroy(User $student)
     {
+        // Delete photo if exists
+        if (!empty($student->photo_path)) {
+            Storage::disk('public')->delete($student->photo_path);
+        }
+        
         $student->delete();
         return redirect()->route('students.manage')->with('status', 'Student deleted successfully.');
     }
@@ -376,6 +393,7 @@ class StudentsController extends Controller
                     'batch_no' => $batchNo,
                     'faculty' => $faculty ?: null,
                     'email' => !empty($email) ? $email : null,
+                    'password' => Hash::make('Academia123'),
                 ]);
                 
                 $imported++;
