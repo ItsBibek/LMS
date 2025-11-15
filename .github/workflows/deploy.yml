@@ -12,21 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
-          extensions: mbstring, xml, ctype, json, bcmath
-
-      - name: Install Composer dependencies
-        run: |
-          composer install --no-dev --optimize-autoloader
-
-      - name: Install Node dependencies
-        run: |
-          npm install
-          npm run build
+          fetch-depth: 0
 
       - name: Deploy to InfinityFree via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -38,3 +25,9 @@ jobs:
           server-dir: ./
           state-name: .ftp-deploy-sync-state.json
           dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/node_modules
+            **/.env
+            **/tests
+            **/.github
